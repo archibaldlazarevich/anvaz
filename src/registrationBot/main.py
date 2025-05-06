@@ -4,14 +4,13 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.types import BotCommand, BotCommandScopeDefault
 
-from src.directorBot.handlers.default.start import router_start_dir
-from src.directorBot.handlers.default.help import router_help_dir
+from src.registrationBot.handlers.default.start import router_register_start
 
-from config.config import DIRECTOR_BOT, DEFAULT_DIRECTOR_COMMANDS
+from config.config import REGISTER_BOT, DEFAULT_REGISTER_COMMAND
 
 
 bot = Bot(
-    token=DIRECTOR_BOT,
+    token=REGISTER_BOT,
 )
 dp = Dispatcher()
 
@@ -19,7 +18,7 @@ dp = Dispatcher()
 async def set_commands():
     commands = [
         BotCommand(command=command[0], description=command[1])
-        for command in DEFAULT_DIRECTOR_COMMANDS
+        for command in DEFAULT_REGISTER_COMMAND
     ]
     await bot.set_my_commands(commands, BotCommandScopeDefault())
 
@@ -30,8 +29,7 @@ async def start_bot():
 
 async def main():
     dp.include_routers(
-        router_help_dir,
-        router_start_dir,
+        router_register_start,
     )
     dp.startup.register(start_bot)
     try:
