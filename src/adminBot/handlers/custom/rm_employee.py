@@ -21,7 +21,10 @@ class RmEm(StatesGroup):
 @router_rm_employee.message(Command("rm_employee"))
 async def add_dir_init(message: Message, state: FSMContext):
     await state.set_state(RmEm.init)
-    await message.reply('Для удаления из базы данных, выберите работника из списка', reply_markup= await rep.check_empl())
+    await message.reply(
+        "Для удаления из базы данных, выберите работника из списка",
+        reply_markup=await rep.check_empl(),
+    )
 
 
 @router_rm_employee.message(RmEm.init)
@@ -29,4 +32,7 @@ async def add_dir_choice(message: Message, state: FSMContext):
     await state.clear()
     name, surname = message.text.split()
     await rm_employee(name=name.lower(), surname=surname.lower())
-    await message.reply(f'Работник {name} {surname} переведен в разряд пользователей', reply_markup=ReplyKeyboardRemove())
+    await message.reply(
+        f"Работник {name} {surname} переведен в разряд пользователей",
+        reply_markup=ReplyKeyboardRemove(),
+    )

@@ -14,6 +14,6 @@ router_jobs_list.message.outer_middleware(TestMiddleware())
 @router_jobs_list.message(Command("jobs_list"))
 async def add_dir_init(message: Message):
     jobs = await get_all_jobs()
-    await message.reply('В базе данных находятся следующие виды работ:')
+    await message.reply("В базе данных находятся следующие виды работ:")
     for job in jobs:
-        await message.answer(f'{job}')
+        await message.answer(f"{job}")

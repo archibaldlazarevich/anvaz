@@ -20,11 +20,13 @@ class AddJob(StatesGroup):
 @router_add_jobs.message(Command("add_jobs"))
 async def add_dir_init(message: Message, state: FSMContext):
     await state.set_state(AddJob.init)
-    await message.reply('Напишите наименование работы')
+    await message.reply("Напишите наименование работы")
 
 
 @router_add_jobs.message(AddJob.init)
 async def add_dir_choice(message: Message, state: FSMContext):
     await state.clear()
-    await add_job(job_name= message.text)
-    await message.reply(f'Новый тип работы "{message.text}" добавлен в базу данных')
+    await add_job(job_name=message.text)
+    await message.reply(
+        f'Новый тип работы "{message.text}" добавлен в базу данных'
+    )

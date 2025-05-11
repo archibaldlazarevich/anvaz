@@ -21,7 +21,9 @@ class AddEm(StatesGroup):
 @router_add_empl.message(Command("add_employee"))
 async def add_dir_init(message: Message, state: FSMContext):
     await state.set_state(AddEm.init)
-    await message.reply('Выберите из списка', reply_markup= await rep.check_staff())
+    await message.reply(
+        "Выберите из списка", reply_markup=await rep.check_staff()
+    )
 
 
 @router_add_empl.message(AddEm.init)
@@ -29,4 +31,7 @@ async def add_dir_choice(message: Message, state: FSMContext):
     await state.clear()
     name, surname = message.text.split()
     await add_employee(name=name.lower(), surname=surname.lower())
-    await message.reply(f'Пользователь {name} {surname} переведен в статус работника', reply_markup= ReplyKeyboardRemove())
+    await message.reply(
+        f"Пользователь {name} {surname} переведен в статус работника",
+        reply_markup=ReplyKeyboardRemove(),
+    )

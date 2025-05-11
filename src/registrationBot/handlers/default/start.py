@@ -34,11 +34,13 @@ async def cmd_start(message: Message, state: FSMContext) -> None:
                 insert(Staff).values(tel_id=message.from_user.id, status=1)
             )
             await session.commit()
-            await message.reply("Введите свою фамилиюю")
+            await message.reply("Введите свою фамилию")
         elif user_data.status == 4:
             await message.reply("Вам отказано в регистрации!!!")
         else:
-            await message.reply("Пользователь с вашим id уже зарегистрирован!!!")
+            await message.reply(
+                "Пользователь с вашим id уже зарегистрирован!!!"
+            )
 
 
 @router_register_start.message(RegisterStaff.init)
@@ -67,7 +69,9 @@ async def cmd_surname(message: Message, state: FSMContext) -> None:
             staff_data = await session.execute(
                 update(Staff)
                 .where(Staff.tel_id == message.from_user.id)
-                .values(name=message.text.lower()).returning(Staff))
+                .values(name=message.text.lower())
+                .returning(Staff)
+            )
             await session.commit()
             staff_data = staff_data.scalar()
         await message.reply(
@@ -76,4 +80,3 @@ async def cmd_surname(message: Message, state: FSMContext) -> None:
     else:
         await state.set_state(RegisterStaff.surname)
         await message.reply("Пожалуйста, введите свое имя корректно")
-

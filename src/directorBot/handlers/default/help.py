@@ -2,6 +2,7 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 from config.config import DEFAULT_DIRECTOR_COMMANDS
+from src.database.data_func import get_all_dir_id
 
 router_help_dir = Router()
 

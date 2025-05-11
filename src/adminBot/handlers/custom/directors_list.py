@@ -14,6 +14,6 @@ router_dir_list.message.outer_middleware(TestMiddleware())
 @router_dir_list.message(Command("dir_list"))
 async def add_dir_init(message: Message):
     directors = await get_all_dir()
-    await message.reply('В базе данных находятся следующие начальники:')
+    await message.reply("В базе данных находятся следующие начальники:")
     for dir_ in directors:
-        await message.answer(f'{dir_[0]} {dir_[1]}')
+        await message.answer(f"{dir_[0]} {dir_[1]}")

@@ -21,7 +21,9 @@ class AddDir(StatesGroup):
 @router_add_directors.message(Command("add_director"))
 async def add_dir_init(message: Message, state: FSMContext):
     await state.set_state(AddDir.init)
-    await message.reply('Выберите из списка', reply_markup= await rep.check_staff())
+    await message.reply(
+        "Выберите из списка", reply_markup=await rep.check_staff()
+    )
 
 
 @router_add_directors.message(AddDir.init)
@@ -29,4 +31,7 @@ async def add_dir_choice(message: Message, state: FSMContext):
     await state.clear()
     name, surname = message.text.split()
     await add_direct(name=name.lower(), surname=surname.lower())
-    await message.reply(f'Пользователь {name} {surname} переведён в статус начальника', reply_markup=ReplyKeyboardRemove())
+    await message.reply(
+        f"Пользователь {name} {surname} переведён в статус начальника",
+        reply_markup=ReplyKeyboardRemove(),
+    )

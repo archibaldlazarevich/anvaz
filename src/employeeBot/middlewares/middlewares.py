@@ -1,16 +1,20 @@
 from aiogram import BaseMiddleware
-from aiogram.types import TelegramObject
+from aiogram.types import Message
 from typing import Callable, Dict, Any, Awaitable
 
 
-class TestMiddleware(BaseMiddleware):
+class EmployeeAccessMiddleware(BaseMiddleware):
+    def __init__(self, get_allowed_ids):
+        self.get_allowed_ids = get_allowed_ids
+
     async def __call__(
         self,
-        handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
-        event: TelegramObject,
+        handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
+        event: Message,
         data: Dict[str, Any],
     ) -> Any:
-        print("Действие для обработчика")
-        result = await handler(event, data)
-        print("Действия после обработчика")
-        return result
+        allowed_ids = await self.get_allowed_ids()
+        if event.from_user.id not in allowed_ids:
+            await event.answer("Доступ запрещён!!!")
+        else:
+            await handler(event, data)

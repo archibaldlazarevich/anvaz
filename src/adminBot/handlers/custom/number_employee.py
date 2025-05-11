@@ -14,5 +14,4 @@ router_emp_number.message.outer_middleware(TestMiddleware())
 @router_emp_number.message(Command("number_emp"))
 async def add_dir_init(message: Message):
     employees = await get_all_emp()
-    await message.reply( f'В базе данных всего {len(employees)} рабочих')
-
+    await message.reply(f"В базе данных всего {len(employees)} рабочих")

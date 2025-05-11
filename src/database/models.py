@@ -1,6 +1,6 @@
 import datetime
 from sqlalchemy import String, ForeignKey
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, relationship
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.types import Integer, DateTime
@@ -22,15 +22,20 @@ class Staff(Base):
     status: Mapped[int] = mapped_column(Integer, nullable=False)
     name: Mapped[str] = mapped_column(String, nullable=True)
     surname: Mapped[str] = mapped_column(String, nullable=True)
+    check_job: Mapped[int] = mapped_column(Integer, nullable=True)
+    job = relationship("Jobs", back_populates="staff")
+
 
 class JobType(Base):
     """
     Модель типов работ
     """
-    __tablename__ = 'job_type'
+
+    __tablename__ = "job_type"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     job_name: Mapped[str] = mapped_column(String, nullable=True)
+    job_type = relationship("Jobs", back_populates="type")
 
 
 class Jobs(Base):
@@ -41,15 +46,23 @@ class Jobs(Base):
     __tablename__ = "jobs"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    job_id: Mapped[str] = mapped_column(ForeignKey('job_type.id'))
+    employee: Mapped[int] = mapped_column(
+        ForeignKey("staff.id", ondelete="CASCADE"), nullable=False
+    )
+    job_id: Mapped[int] = mapped_column(ForeignKey("job_type.id"))
     address: Mapped[str] = mapped_column(String, nullable=False)
+    company_name: Mapped[str] = mapped_column(String, nullable=False)
     time_add: Mapped[datetime.datetime] = mapped_column(
         DateTime, default=datetime.datetime.today()
     )
-    time_close: Mapped[datetime.datetime] = mapped_column(DateTime)
+    time_close: Mapped[datetime.datetime] = mapped_column(
+        DateTime, nullable=True
+    )
+    staff = relationship("Staff", back_populates="job")
+    type = relationship("JobType", back_populates="job_type")
 
 
-class Change_jobs(Base):
+class ChangeJobs(Base):
     """
     Модель изменения заявки
     """

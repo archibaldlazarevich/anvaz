@@ -4,8 +4,16 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.types import BotCommand, BotCommandScopeDefault
 
+from src.database.data_func import get_all_dir_id
 from src.directorBot.handlers.default.start import router_start_dir
 from src.directorBot.handlers.default.help import router_help_dir
+from src.directorBot.handlers.custom.in_process import router_in_process
+from src.directorBot.handlers.custom.employee import router_dir_emp
+from src.directorBot.handlers.custom.pdf import router_dir_pdf
+from src.directorBot.handlers.custom.update_cancel import router_update
+from src.directorBot.handlers.custom.busy import router_dir_busy_emp
+
+from src.directorBot.middlewares.middlewares import DirectorAccessMiddleware
 
 from config.config import DIRECTOR_BOT, DEFAULT_DIRECTOR_COMMANDS
 
@@ -32,8 +40,16 @@ async def main():
     dp.include_routers(
         router_help_dir,
         router_start_dir,
+        router_in_process,
+        router_update,
+        router_dir_busy_emp,
+        router_dir_pdf,
+        router_dir_emp
     )
     dp.startup.register(start_bot)
+    dp.message.middleware(
+        DirectorAccessMiddleware(get_allowed_ids=get_all_dir_id)
+    )
     try:
         await bot.delete_webhook(drop_pending_updates=True)
         await dp.start_polling(

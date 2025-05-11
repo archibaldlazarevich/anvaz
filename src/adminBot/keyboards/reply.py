@@ -1,7 +1,13 @@
 from aiogram.types import KeyboardButton
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
-from src.database.data_func import get_all_non_employee, get_all_dir, get_all_emp, get_all_jobs, get_all_dell
+from src.database.data_func import (
+    get_all_non_employee,
+    get_all_dir,
+    get_all_emp,
+    get_all_jobs,
+    get_all_dell,
+)
 
 
 async def check_staff():
@@ -12,8 +18,11 @@ async def check_staff():
     all_staff_data = await get_all_non_employee()
     keyboard = ReplyKeyboardBuilder()
     for data in all_staff_data:
-        keyboard.add(KeyboardButton(text=f'{data[0].title()} {data[1].title()}'))
+        keyboard.add(
+            KeyboardButton(text=f"{data[0].title()} {data[1].title() or ""}")
+        )
     return keyboard.adjust(1).as_markup(resize_keyboard=True)
+
 
 async def check_dir():
     """
@@ -23,8 +32,11 @@ async def check_dir():
     all_dir_data = await get_all_dir()
     keyboard = ReplyKeyboardBuilder()
     for data in all_dir_data:
-        keyboard.add(KeyboardButton(text=f'{data[0].title()} {data[1].title()}'))
+        keyboard.add(
+            KeyboardButton(text=f"{data[0].title()} {data[1].title()}")
+        )
     return keyboard.adjust(1).as_markup(resize_keyboard=True)
+
 
 async def check_empl():
     """
@@ -34,7 +46,9 @@ async def check_empl():
     all_empl_data = await get_all_emp()
     keyboard = ReplyKeyboardBuilder()
     for data in all_empl_data:
-        keyboard.add(KeyboardButton(text=f'{data[0].title()} {data[1].title()}'))
+        keyboard.add(
+            KeyboardButton(text=f"{data[0].title()} {data[1].title()}")
+        )
     return keyboard.adjust(1).as_markup(resize_keyboard=True)
 
 
@@ -49,6 +63,7 @@ async def check_job():
         keyboard.add(KeyboardButton(text=data))
     return keyboard.adjust(1).as_markup(resize_keyboard=True)
 
+
 async def check_del_staff():
     """
     Функция составления клавиатуры со всеми забаненными пользователями
@@ -57,5 +72,7 @@ async def check_del_staff():
     all_del_staff_data = await get_all_dell()
     keyboard = ReplyKeyboardBuilder()
     for data in all_del_staff_data:
-        keyboard.add(KeyboardButton(text=f'{data[0].title()} {data[1].title()}'))
+        keyboard.add(
+            KeyboardButton(text=f"{data[0].title()} {data[1].title()}")
+        )
     return keyboard.adjust(1).as_markup(resize_keyboard=True)

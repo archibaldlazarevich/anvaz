@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import (
 from sqlalchemy.pool import NullPool
 from typing import AsyncGenerator
 from config.config import DATABASE_URL
-from src.database.models import Base, Admin, Staff, JobType, Change_jobs, Jobs
+from src.database.models import Base, Admin, Staff, JobType, ChangeJobs, Jobs
 from faker import Faker
 import random
 
@@ -18,7 +18,7 @@ fake = Faker()
 
 engine: AsyncEngine = create_async_engine(
     DATABASE_URL,
-    # echo=True,
+    echo=True,
     poolclass=NullPool,
 )
 
@@ -34,24 +34,58 @@ async def get_db_session() -> AsyncGenerator:
     async with async_session_maker() as session:
         yield session
 
+
 async def create_db() -> None:
-    admin = Admin(tel_ad_id = 434988753)
+    admin = Admin(tel_ad_id=434988753)
     users = [
-        Staff(tel_id= random.randint(434988753, 500000000), status= 1, name= fake.last_name().lower(), surname= fake.last_name().lower())
+        Staff(
+            tel_id=random.randint(434988753, 500000000),
+            status=1,
+            name=fake.last_name().lower(),
+            surname=fake.last_name().lower(),
+        )
         for i in range(3)
     ]
     employees = [
-        Staff(tel_id= random.randint(43498875, 50000000), status= 2, name= fake.first_name().lower(), surname= fake.last_name().lower())
+        Staff(
+            tel_id=random.randint(43498875, 50000000),
+            status=2,
+            name=fake.first_name().lower(),
+            surname=fake.last_name().lower(),
+            check_job= 1
+        )
         for i in range(3)
     ]
     directors = [
-        Staff(tel_id= random.randint(4349887, 5000000), status= 3, name= fake.first_name().lower(), surname= fake.last_name().lower())
+        Staff(
+            tel_id=random.randint(4349887, 5000000),
+            status=3,
+            name=fake.first_name().lower(),
+            surname=fake.last_name().lower(),
+        )
         for i in range(3)
+    ]
+    jobs_type = [
+        JobType(job_name=fake.text(max_nb_chars=50).lower()) for i in range(3)
     ]
     jobs = [
-        JobType(job_name= fake.text(max_nb_chars=50).lower())
-        for i in range(3)
+        Jobs(
+            job_id=i,
+            address=fake.street_address(),
+            company_name=fake.company(),
+            employee=i + 3,
+        )
+        for i in range(1, 4)
     ]
+    directors.append(
+        Staff(
+            tel_id=434988753,
+            status=3,
+            name=fake.first_name().lower(),
+            surname=fake.last_name().lower(),
+        )
+    )
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
@@ -61,7 +95,6 @@ async def create_db() -> None:
         session.add_all(users)
         session.add_all(employees)
         session.add_all(directors)
+        session.add_all(jobs_type)
         session.add_all(jobs)
         await session.commit()
-
-
