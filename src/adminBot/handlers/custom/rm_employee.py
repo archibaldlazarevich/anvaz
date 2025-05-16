@@ -7,7 +7,7 @@ from aiogram.fsm.context import FSMContext
 
 from src.adminBot.middlewares.middlewares import TestMiddleware
 import src.adminBot.keyboards.reply as rep
-from src.database.data_func import rm_employee
+from src.database.func.data_func import rm_employee
 
 router_rm_employee = Router()
 

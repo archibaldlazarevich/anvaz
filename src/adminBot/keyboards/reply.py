@@ -1,7 +1,7 @@
 from aiogram.types import KeyboardButton
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
-from src.database.data_func import (
+from src.database.func.data_func import (
     get_all_non_employee,
     get_all_dir,
     get_all_emp,

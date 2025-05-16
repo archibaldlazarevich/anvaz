@@ -4,7 +4,7 @@ from aiogram.types import Message
 
 
 from src.adminBot.middlewares.middlewares import TestMiddleware
-from src.database.data_func import get_all_emp
+from src.database.func.data_func import get_all_emp
 
 router_emp_list = Router()
 

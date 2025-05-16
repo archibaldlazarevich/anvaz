@@ -6,7 +6,7 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 
 from src.adminBot.middlewares.middlewares import TestMiddleware
-from src.database.data_func import add_job
+from src.database.func.data_func import add_job
 
 router_add_jobs = Router()
 

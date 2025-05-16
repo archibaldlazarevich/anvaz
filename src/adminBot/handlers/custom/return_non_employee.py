@@ -7,7 +7,7 @@ from aiogram.fsm.context import FSMContext
 
 from src.adminBot.middlewares.middlewares import TestMiddleware
 import src.adminBot.keyboards.reply as rep
-from src.database.data_func import return_del
+from src.database.func.data_func import return_del
 
 router_return_non_staff = Router()
 

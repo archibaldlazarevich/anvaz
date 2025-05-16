@@ -2,7 +2,7 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 
-from src.database.data_func import (
+from src.database.func.data_func import (
     check_if_update,
     check_update_sub,
     cancel_update,

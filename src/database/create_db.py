@@ -9,7 +9,15 @@ from sqlalchemy.ext.asyncio import (
 from sqlalchemy.pool import NullPool
 from typing import AsyncGenerator
 from config.config import DATABASE_URL
-from src.database.models import Base, Admin, Staff, JobType, ChangeJobs, Jobs
+from src.database.models import (
+    Base,
+    Admin,
+    Staff,
+    JobType,
+    ChangeJobs,
+    Jobs,
+    Company,
+)
 from faker import Faker
 import random
 
@@ -52,7 +60,6 @@ async def create_db() -> None:
             status=2,
             name=fake.first_name().lower(),
             surname=fake.last_name().lower(),
-            check_job= 1
         )
         for i in range(3)
     ]
@@ -62,6 +69,7 @@ async def create_db() -> None:
             status=3,
             name=fake.first_name().lower(),
             surname=fake.last_name().lower(),
+            check_job=1,
         )
         for i in range(3)
     ]
@@ -71,8 +79,7 @@ async def create_db() -> None:
     jobs = [
         Jobs(
             job_id=i,
-            address=fake.street_address(),
-            company_name=fake.company(),
+            company_id=i,
             employee=i + 3,
         )
         for i in range(1, 4)
@@ -86,6 +93,14 @@ async def create_db() -> None:
         )
     )
 
+    company = [
+        Company(
+            company_name=fake.company().lower(),
+            address=fake.street_address(),
+        )
+        for i in range(1, 4)
+    ]
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
@@ -97,4 +112,5 @@ async def create_db() -> None:
         session.add_all(directors)
         session.add_all(jobs_type)
         session.add_all(jobs)
+        session.add_all(company)
         await session.commit()

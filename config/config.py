@@ -13,6 +13,10 @@ DIRECTOR_BOT: str = cast(str, os.getenv("DIRECTOR_BOT"))
 EMPLOYEE_BOT: str = cast(str, os.getenv("EMPLOYEE_BOT"))
 ADMIN_BOT: str = cast(str, os.getenv("ADMIN_BOT"))
 REGISTER_BOT: str = cast(str, os.getenv("REGISTER_BOT"))
+ECHO_BOT: str = cast(str, os.getenv("ECHO_BOT"))
+EMAIL_NAME: str = cast(str, os.getenv("EMAIL_NAME"))
+EMAIL_PASSWORD: str = cast(str, os.getenv("EMAIL_PASSWORD"))
+RECIPIENT_EMAIL: str = cast(str, os.getenv("RECIPIENT_EMAIL"))
 
 DEFAULT_EMPLOYEE_COMMANDS = (
     ("start", "Запустить бота"),
@@ -31,7 +35,7 @@ DEFAULT_DIRECTOR_COMMANDS = (
     ("cancel", "Прекратить получение данных о новых заявках"),
     ("employee", "Получить данные о действующих заявках работника"),
     ("busy", "Получить данные о занятых работниках"),
-    ("pdf", "Получить данные о завках в pdf-виде"),
+    ("excel", "Получить данные о завках в excel-виде"),
 )
 
 DEFAULT_ADMIN_COMMANDS = (

@@ -2,7 +2,7 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 
-from src.database.data_func import get_all_proc_jobs, get_all_dir_id
+from src.database.func.data_func import get_all_proc_jobs
 
 router_in_process = Router()
 

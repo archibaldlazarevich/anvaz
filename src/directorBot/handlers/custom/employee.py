@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, ReplyKeyboardRemove
 
-from src.database.data_func import check_if_have_busy_amp, get_job_by_empl
+from src.database.func.data_func import check_if_have_busy_amp, get_job_by_empl
 import src.directorBot.keyboards.reply as rep
 
 router_dir_emp = Router()

@@ -4,7 +4,7 @@ from aiogram.types import Message
 
 from config.config import DEFAULT_ADMIN_COMMANDS
 from src.adminBot.middlewares.middlewares import TestMiddleware
-from src.database.data_func import get_admin_id
+from src.database.func.data_func import get_admin_id
 
 router_start_admin = Router()
 

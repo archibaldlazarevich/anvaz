@@ -4,12 +4,14 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.types import BotCommand, BotCommandScopeDefault
 
-from src.database.data_func import get_all_dir_id
+from src.database.func.data_func import get_all_dir_id
 from src.directorBot.handlers.default.start import router_start_dir
 from src.directorBot.handlers.default.help import router_help_dir
 from src.directorBot.handlers.custom.in_process import router_in_process
 from src.directorBot.handlers.custom.employee import router_dir_emp
-from src.directorBot.handlers.custom.pdf import router_dir_pdf
+
+# from src.directorBot.handlers.custom.pdf import router_dir_pdf
+from src.directorBot.handlers.custom.excel import router_dir_excel
 from src.directorBot.handlers.custom.update_cancel import router_update
 from src.directorBot.handlers.custom.busy import router_dir_busy_emp
 
@@ -43,8 +45,9 @@ async def main():
         router_in_process,
         router_update,
         router_dir_busy_emp,
-        router_dir_pdf,
-        router_dir_emp
+        # router_dir_pdf,
+        router_dir_emp,
+        router_dir_excel,
     )
     dp.startup.register(start_bot)
     dp.message.middleware(
