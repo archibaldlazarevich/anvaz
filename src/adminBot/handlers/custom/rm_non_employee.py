@@ -5,13 +5,10 @@ from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 
-from src.adminBot.middlewares.middlewares import TestMiddleware
 import src.adminBot.keyboards.reply as rep
 from src.database.func.data_func import rm_non_staff
 
 router_rm_non_staff = Router()
-
-router_rm_non_staff.message.outer_middleware(TestMiddleware())
 
 
 class RmNonStaff(StatesGroup):
@@ -20,11 +17,15 @@ class RmNonStaff(StatesGroup):
 
 @router_rm_non_staff.message(Command("rm_non_staff"))
 async def add_dir_init(message: Message, state: FSMContext):
-    await state.set_state(RmNonStaff.init)
-    await message.reply(
-        "Для удаления из базы данных, выберите пользователя из списка",
-        reply_markup=await rep.check_staff(),
-    )
+    rm_mark = await rep.check_staff()
+    if rm_mark:
+        await state.set_state(RmNonStaff.init)
+        await message.reply(
+            "Для удаления из базы данных, выберите пользователя из списка",
+            reply_markup=rm_mark,
+        )
+    else:
+        await message.reply("В базе данных нет свободных пользователей")
 
 
 @router_rm_non_staff.message(RmNonStaff.init)

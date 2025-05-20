@@ -17,12 +17,13 @@ from src.database.models import (
     ChangeJobs,
     Jobs,
     Company,
+    Address,
 )
 from faker import Faker
 import random
 
 
-fake = Faker()
+fake = Faker(locale="ru_RU")
 
 engine: AsyncEngine = create_async_engine(
     DATABASE_URL,
@@ -64,22 +65,24 @@ async def create_db() -> None:
         for i in range(3)
     ]
     directors = [
-        Staff(
-            tel_id=random.randint(4349887, 5000000),
-            status=3,
-            name=fake.first_name().lower(),
-            surname=fake.last_name().lower(),
-            check_job=1,
-        )
-        for i in range(3)
+        # Staff(
+        #     tel_id=random.randint(4349887, 5000000),
+        #     status=3,
+        #     name=fake.first_name().lower(),
+        #     surname=fake.last_name().lower(),
+        #     check_job=1,
+        # )
+        # for i in range(3)
     ]
     jobs_type = [
-        JobType(job_name=fake.text(max_nb_chars=50).lower()) for i in range(3)
+        JobType(job_name=fake.text(max_nb_chars=50).lower(), active=1)
+        for i in range(3)
     ]
     jobs = [
         Jobs(
             job_id=i,
             company_id=i,
+            address_id=i,
             employee=i + 3,
         )
         for i in range(1, 4)
@@ -92,11 +95,24 @@ async def create_db() -> None:
             surname=fake.last_name().lower(),
         )
     )
-
+    employees.append(
+        Staff(
+            tel_id=434988753,
+            status=2,
+            name=fake.first_name().lower(),
+            surname=fake.last_name().lower(),
+        )
+    )
     company = [
         Company(
             company_name=fake.company().lower(),
-            address=fake.street_address(),
+        )
+        for i in range(1, 4)
+    ]
+    address = [
+        Address(
+            address=fake.street_address().lower(),
+            company_id=i,
         )
         for i in range(1, 4)
     ]
@@ -113,4 +129,5 @@ async def create_db() -> None:
         session.add_all(jobs_type)
         session.add_all(jobs)
         session.add_all(company)
+        session.add_all(address)
         await session.commit()

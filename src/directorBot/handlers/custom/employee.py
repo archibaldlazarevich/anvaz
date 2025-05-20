@@ -38,8 +38,8 @@ async def dir_emp_init(message: Message, state: FSMContext):
     for job in job_data:
         await message.answer(
             f"Заявка № {job[0]}\n"
-            f"Тип работы: {job[1]}\n"
-            f"Организация: {job[2]}\n"
+            f"Тип работы: {job[1].capitalize()}\n"
+            f"Организация: {job[2].capitalize()}\n"
             f"Время поступления заявки: {job[3]}\n",
             reply_markup=ReplyKeyboardRemove(),
         )

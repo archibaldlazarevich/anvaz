@@ -15,8 +15,10 @@ async def proc_init(message: Message):
         for job in proc:
             await message.reply(
                 f"Заявка № {job[0]}\n"
-                f"Тип работы: {job[1]}\n"
-                f"Организация: {job[2]}\n"
+                f"Тип работы: {job[1].capitalize()}\n"
+                f"Организация: {job[2].capitalize()}\n"
                 f"Время поступления заявки: {job[3]}\n"
                 f"Сотрудник, вполняющий заявку: {job[4].title()} {job[5].title()}\n"
             )
+    else:
+        await message.reply("В данный момент нет действующих заявок")

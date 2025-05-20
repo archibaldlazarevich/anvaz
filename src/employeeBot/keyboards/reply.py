@@ -7,6 +7,7 @@ from src.database.func.data_func import (
     get_address_by_empl_id,
     get_all_job_by_empl,
     get_address_by_empl_id_for_update,
+    get_all_company_name_without_spec,
 )
 
 
@@ -42,6 +43,25 @@ async def get_company_name_mark():
     return False
 
 
+async def get_company_name_mark_without_spec(company_name: str):
+    """
+    Функция возвращает клавиатуру если есть названия компаний в бд и False при их отсутствии
+    :return:
+    """
+    all_company_name = await get_all_company_name_without_spec(
+        company_name=company_name
+    )
+    if len(all_company_name) != 0:
+        keyboard = ReplyKeyboardBuilder()
+        for data in all_company_name:
+            keyboard.add(KeyboardButton(text=f"{data.capitalize()}"))
+        return keyboard.adjust(1).as_markup(
+            resize_keyboard=True,
+            one_time_keyboard=True,
+        )
+    return False
+
+
 async def check_address(empl_id: int):
     """
     Функция возвращает клавиатуру есть есть адреса объектов по базе данных и False при их отсутствии
@@ -51,7 +71,7 @@ async def check_address(empl_id: int):
     if all_address_by_company:
         keyboard = ReplyKeyboardBuilder()
         for data in all_address_by_company:
-            keyboard.add(KeyboardButton(text=f"{data.title()}"))
+            keyboard.add(KeyboardButton(text=f"{data.capitalize()}"))
         return keyboard.adjust(1).as_markup(
             resize_keyboard=True,
             one_time_keyboard=True,
@@ -72,8 +92,8 @@ async def check_task(empl_id: int):
             keyboard.add(
                 KeyboardButton(
                     text=f"Заявка № {data[0]}\n"
-                    f"Организация {data[1]}\n"
-                    f"Адрес {data[2]}"
+                    f"Организация: {data[1].capitalize()}\n"
+                    f"Адрес: {data[2].capitalize()}"
                 )
             )
         return keyboard.adjust(1).as_markup(
@@ -111,13 +131,13 @@ jobs_choose_rep = ReplyKeyboardMarkup(
 )
 
 
-async def check_address_for_update(empl_id: int):
+async def check_address_for_update(company_name: str):
     """
     Функция возвращает клавиатуру если есть адреса объектов по базе данных и False при их отсутствии
     :return:
     """
     all_address_by_company = await get_address_by_empl_id_for_update(
-        empl_id=empl_id
+        company_name=company_name
     )
     if all_address_by_company:
         keyboard = ReplyKeyboardBuilder()

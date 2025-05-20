@@ -4,9 +4,13 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.types import BotCommand, BotCommandScopeDefault
 
-from src.database.func.data_func import get_all_dir_id
-from src.employeeBot.handlers.default.start import router_start_dir
-from src.employeeBot.handlers.default.help import router_help_dir
+from src.database.func.data_func import get_all_empl_id
+from src.employeeBot.handlers.default.start import router_empl_start
+from src.employeeBot.handlers.default.help import router_empl_help
+from src.employeeBot.handlers.custom.close import router_close_task
+from src.employeeBot.handlers.custom.update import router_update_task
+from src.employeeBot.handlers.custom.check import router_check_task
+from src.employeeBot.handlers.custom.create import router_create_task
 
 from src.employeeBot.middlewares.middlewares import EmployeeAccessMiddleware
 
@@ -33,12 +37,16 @@ async def start_bot():
 
 async def main():
     dp.include_routers(
-        router_help_dir,
-        router_start_dir,
+        router_empl_help,
+        router_create_task,
+        router_close_task,
+        router_update_task,
+        router_check_task,
+        router_empl_start,
     )
     dp.startup.register(start_bot)
     dp.message.middleware(
-        EmployeeAccessMiddleware(get_allowed_ids=get_all_dir_id)
+        EmployeeAccessMiddleware(get_allowed_ids=get_all_empl_id)
     )
     try:
         await bot.delete_webhook(drop_pending_updates=True)

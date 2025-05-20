@@ -5,6 +5,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.types import BotCommand, BotCommandScopeDefault
 
 from src.database.func.data_func import get_all_dir_id
+from src.directorBot.handlers.custom.change_empl import router_change
 from src.directorBot.handlers.default.start import router_start_dir
 from src.directorBot.handlers.default.help import router_help_dir
 from src.directorBot.handlers.custom.in_process import router_in_process
@@ -48,6 +49,7 @@ async def main():
         # router_dir_pdf,
         router_dir_emp,
         router_dir_excel,
+        router_change,
     )
     dp.startup.register(start_bot)
     dp.message.middleware(

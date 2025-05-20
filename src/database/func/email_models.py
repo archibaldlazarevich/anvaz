@@ -20,10 +20,12 @@ async def get_all_data_for_pdf_or_excel(
     query = (
         select(Jobs)
         .join(Jobs.company)
+        .join(Jobs.address)
         .options(
             joinedload(Jobs.staff),
             joinedload(Jobs.type),
             joinedload(Jobs.company),
+            joinedload(Jobs.address),
         )
     )
     if not all_:
@@ -65,10 +67,12 @@ async def get_personal_data_for_pdf_or_excel(
     query = (
         select(Jobs)
         .join(Jobs.staff)
+        .join(Jobs.address)
         .options(
             joinedload(Jobs.type),
             joinedload(Jobs.staff),
             joinedload(Jobs.company),
+            joinedload(Jobs.address),
         )
     )
     if not all_:

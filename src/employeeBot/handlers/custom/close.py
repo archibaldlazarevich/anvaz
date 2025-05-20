@@ -6,7 +6,11 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, ReplyKeyboardRemove
 
 from config.config import ECHO_BOT
-from src.database.func.data_func import close_task_by_empl, get_all_dir_id
+from src.database.func.data_func import (
+    close_task_by_empl,
+    get_all_dir_id,
+    get_all_dir_id_for_echo,
+)
 import src.employeeBot.keyboards.reply as rep
 from src.database.func.email_func import send_email
 
@@ -39,27 +43,27 @@ async def close_task(message: Message, state: FSMContext):
     await message.reply(
         "Заявка успешно закрыта:\n"
         f"Заявка № {task_data[0]}\n"
-        f"Заказчик: {task_data[1]}\n"
-        f"Адрес объекта: {task_data[2]}\n"
+        f"Заказчик: {task_data[1].capitalize()}\n"
+        f"Адрес объекта: {task_data[2].capitalize()}\n"
         f"Время регистрации заявки {task_data[3]}\n"
         f"Время закрытия заявки {task_data[4]}",
         reply_markup=ReplyKeyboardRemove(),
     )
     text = (
-        f"Сотрудник {task_data[5]} {task_data[6]} закрыл действующую заявку:\n"
+        f"Сотрудник {task_data[5].title()} {task_data[6].title()} закрыл действующую заявку:\n"
         f"Заявка № {task_data[0]}\n"
-        f"Заказчик: {task_data[1]}\n"
-        f"Адрес объекта: {task_data[2]}\n"
+        f"Заказчик: {task_data[1].capitalize()}\n"
+        f"Адрес объекта: {task_data[2].capitalize()}\n"
         f"Время регистрации заявки {task_data[3]}\n"
         f"Время закрытия заявки {task_data[4]}"
     )
-    dir_all_id = await get_all_dir_id()
+    dir_all_id = await get_all_dir_id_for_echo()
     for dir_id in dir_all_id:
         await bot.send_message(
             text=text,
             chat_id=dir_id,
         )
     await send_email(
-        subject=f"Сотрудник {task_data[4]} {task_data[3]} выполнил заявку № {task_data[0]}",
+        subject=f"Сотрудник {task_data[5].title()} {task_data[6].title()}  выполнил заявку № {task_data[0]}",
         message=text,
     )

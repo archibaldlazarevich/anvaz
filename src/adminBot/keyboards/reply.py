@@ -7,6 +7,7 @@ from src.database.func.data_func import (
     get_all_emp,
     get_all_jobs,
     get_all_dell,
+    get_all_dell_job,
 )
 
 
@@ -17,11 +18,15 @@ async def check_staff():
     """
     all_staff_data = await get_all_non_employee()
     keyboard = ReplyKeyboardBuilder()
-    for data in all_staff_data:
-        keyboard.add(
-            KeyboardButton(text=f"{data[0].title()} {data[1].title() or ""}")
-        )
-    return keyboard.adjust(1).as_markup(resize_keyboard=True)
+    if len(all_staff_data) != 0:
+        for data in all_staff_data:
+            keyboard.add(
+                KeyboardButton(
+                    text=f"{data[0].title()} {data[1].title() or ""}"
+                )
+            )
+        return keyboard.adjust(1).as_markup(resize_keyboard=True)
+    return False
 
 
 async def check_dir():
@@ -31,11 +36,13 @@ async def check_dir():
     """
     all_dir_data = await get_all_dir()
     keyboard = ReplyKeyboardBuilder()
-    for data in all_dir_data:
-        keyboard.add(
-            KeyboardButton(text=f"{data[0].title()} {data[1].title()}")
-        )
-    return keyboard.adjust(1).as_markup(resize_keyboard=True)
+    if len(all_dir_data) != 0:
+        for data in all_dir_data:
+            keyboard.add(
+                KeyboardButton(text=f"{data[0].title()} {data[1].title()}")
+            )
+        return keyboard.adjust(1).as_markup(resize_keyboard=True)
+    return False
 
 
 async def check_empl():
@@ -45,11 +52,13 @@ async def check_empl():
     """
     all_empl_data = await get_all_emp()
     keyboard = ReplyKeyboardBuilder()
-    for data in all_empl_data:
-        keyboard.add(
-            KeyboardButton(text=f"{data[0].title()} {data[1].title()}")
-        )
-    return keyboard.adjust(1).as_markup(resize_keyboard=True)
+    if len(all_empl_data) != 0:
+        for data in all_empl_data:
+            keyboard.add(
+                KeyboardButton(text=f"{data[0].title()} {data[1].title()}")
+            )
+        return keyboard.adjust(1).as_markup(resize_keyboard=True)
+    return False
 
 
 async def check_job():
@@ -59,9 +68,11 @@ async def check_job():
     """
     all_job_data = await get_all_jobs()
     keyboard = ReplyKeyboardBuilder()
-    for data in all_job_data:
-        keyboard.add(KeyboardButton(text=data))
-    return keyboard.adjust(1).as_markup(resize_keyboard=True)
+    if len(all_job_data) != 0:
+        for data in all_job_data:
+            keyboard.add(KeyboardButton(text=data.capitalize()))
+        return keyboard.adjust(1).as_markup(resize_keyboard=True)
+    return False
 
 
 async def check_del_staff():
@@ -71,8 +82,24 @@ async def check_del_staff():
     """
     all_del_staff_data = await get_all_dell()
     keyboard = ReplyKeyboardBuilder()
+    if len(all_del_staff_data) == 0:
+        return False
     for data in all_del_staff_data:
         keyboard.add(
             KeyboardButton(text=f"{data[0].title()} {data[1].title()}")
         )
+    return keyboard.adjust(1).as_markup(resize_keyboard=True)
+
+
+async def check_job_del():
+    """
+    Функция составления клавиатуры со всеми забаненными видами работ
+    :return:
+    """
+    all_del_staff_data = await get_all_dell_job()
+    keyboard = ReplyKeyboardBuilder()
+    if len(all_del_staff_data) == 0:
+        return False
+    for data in all_del_staff_data:
+        keyboard.add(KeyboardButton(text=f"{data.capitalize()}"))
     return keyboard.adjust(1).as_markup(resize_keyboard=True)

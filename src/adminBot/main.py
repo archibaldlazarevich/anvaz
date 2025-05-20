@@ -4,9 +4,11 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.types import BotCommand, BotCommandScopeDefault
 
+
 from src.adminBot.handlers.default.start import router_start_admin
 from src.adminBot.handlers.default.help import router_help_admin
 
+from src.adminBot.handlers.custom.return_job import router_return_job
 from src.adminBot.handlers.custom.add_director import router_add_directors
 from src.adminBot.handlers.custom.add_employee import router_add_empl
 from src.adminBot.handlers.custom.add_jobs import router_add_jobs
@@ -19,9 +21,16 @@ from src.adminBot.handlers.custom.rm_director import router_rm_directors
 from src.adminBot.handlers.custom.rm_employee import router_rm_employee
 from src.adminBot.handlers.custom.rm_job import router_rm_jobs
 from src.adminBot.handlers.custom.rm_non_employee import router_rm_non_staff
+from src.adminBot.handlers.custom.ban_non_empl_list import (
+    router_ban_non_empl_list,
+)
+from src.adminBot.handlers.custom.return_non_employee import (
+    router_return_non_staff,
+)
 
 from config.config import ADMIN_BOT, DEFAULT_ADMIN_COMMANDS
-
+from src.adminBot.middlewares.middlewares import AdminAccessMiddleware
+from src.database.func.data_func import get_admin_id
 
 bot = Bot(
     token=ADMIN_BOT,
@@ -57,8 +66,12 @@ async def main():
         router_rm_employee,
         router_rm_jobs,
         router_rm_non_staff,
+        router_return_non_staff,
+        router_ban_non_empl_list,
+        router_return_job,
     )
     dp.startup.register(start_bot)
+    dp.message.middleware(AdminAccessMiddleware(get_allowed_ids=get_admin_id))
     try:
         await bot.delete_webhook(drop_pending_updates=True)
         await dp.start_polling(

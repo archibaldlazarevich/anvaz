@@ -18,7 +18,11 @@ class Staff(Base):
     __tablename__ = "staff"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    tel_id: Mapped[int] = mapped_column(Integer, nullable=False, unique=True)
+    tel_id: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        # unique=True ## Правка
+    )
     status: Mapped[int] = mapped_column(Integer, nullable=False)
     name: Mapped[str] = mapped_column(String, nullable=True)
     surname: Mapped[str] = mapped_column(String, nullable=True)
@@ -37,6 +41,7 @@ class JobType(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     job_name: Mapped[str] = mapped_column(String, nullable=True)
     number_tasks: Mapped[int] = mapped_column(Integer, nullable=True)
+    active: Mapped[int] = mapped_column(Integer, nullable=True)
     jobs = relationship("Jobs", back_populates="type")
     change_old = relationship(
         "ChangeJobs",
@@ -70,6 +75,12 @@ class Jobs(Base):
         ),
         nullable=True,
     )
+    address_id: Mapped[int] = mapped_column(
+        ForeignKey(
+            "address.id",
+        ),
+        nullable=True,
+    )
     time_add: Mapped[datetime.datetime] = mapped_column(
         DateTime, default=datetime.datetime.today()
     )
@@ -89,6 +100,7 @@ class Jobs(Base):
         foreign_keys="[ChangeJobs.time_init]",
         back_populates="jobs_time",
     )
+    address = relationship("Address", back_populates="jobs")
 
 
 class ChangeJobs(Base):
@@ -115,8 +127,14 @@ class ChangeJobs(Base):
     company_new_id: Mapped[int] = mapped_column(
         ForeignKey("company.id"), nullable=True
     )
+    address_old_id: Mapped[int] = mapped_column(
+        ForeignKey("address.id"), nullable=False
+    )
+    address_new_id: Mapped[int] = mapped_column(
+        ForeignKey("address.id"), nullable=True
+    )
     time_change: Mapped[datetime.datetime] = mapped_column(
-        DateTime, default=datetime.datetime.today()
+        DateTime, nullable=True
     )
     time_init: Mapped[datetime.datetime] = mapped_column(
         ForeignKey("jobs.time_add"), nullable=False
@@ -140,6 +158,12 @@ class ChangeJobs(Base):
     company_new = relationship(
         "Company", foreign_keys=[company_new_id], back_populates="change_new"
     )
+    address_old = relationship(
+        "Address", foreign_keys=[address_old_id], back_populates="change_old"
+    )
+    address_new = relationship(
+        "Address", foreign_keys=[address_new_id], back_populates="change_new"
+    )
 
 
 class Admin(Base):
@@ -162,8 +186,9 @@ class Company(Base):
     __tablename__ = "company"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    company_name: Mapped[str] = mapped_column(String, nullable=False)
-    address: Mapped[str] = mapped_column(String, nullable=True)
+    company_name: Mapped[str] = mapped_column(
+        String, nullable=False, unique=True
+    )
     tasks: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     jobs = relationship("Jobs", back_populates="company")
     change_old = relationship(
@@ -175,4 +200,34 @@ class Company(Base):
         "ChangeJobs",
         foreign_keys="[ChangeJobs.company_new_id]",
         back_populates="company_new",
+    )
+    address = relationship(
+        "Address",
+        back_populates="company",
+    )
+
+
+class Address(Base):
+    """
+    Модель аресов комапний
+    """
+
+    __tablename__ = "address"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    address: Mapped[str] = mapped_column(String, nullable=False)
+    company_id: Mapped[int] = mapped_column(
+        ForeignKey("company.id"), nullable=False
+    )
+    company = relationship("Company", back_populates="address")
+    jobs = relationship("Jobs", back_populates="address")
+    change_old = relationship(
+        "ChangeJobs",
+        foreign_keys="[ChangeJobs.address_old_id]",
+        back_populates="address_old",
+    )
+    change_new = relationship(
+        "ChangeJobs",
+        foreign_keys="[ChangeJobs.address_new_id]",
+        back_populates="address_new",
     )

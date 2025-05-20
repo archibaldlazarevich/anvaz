@@ -9,7 +9,7 @@ from config.config import DEFAULT_EMPLOYEE_COMMANDS
 router_empl_start = Router()
 
 
-@router_empl_start.message(CommandStart)
+@router_empl_start.message(CommandStart())
 async def empl_start_command(message: Message):
     commands = "\n".join(
         [
