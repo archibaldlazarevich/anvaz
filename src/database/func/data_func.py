@@ -24,11 +24,14 @@ async def add_direct(name: str, surname: str) -> int:
     :return: int статус
     """
     async with get_db_session() as session:
-        director_data = await session.execute(
+        await session.execute(
             update(Staff)
             .where(and_(Staff.name == name, Staff.surname == surname))
             .values(status=3)
-            .returning(Staff.status)
+        )
+        director_data = await session.execute(
+            select(Staff.status)
+            .where(and_(Staff.name == name, Staff.surname == surname))
         )
         await session.commit()
         director = director_data.scalar_one_or_none()
@@ -69,11 +72,14 @@ async def add_employee(name: str, surname: str) -> int:
     :return: int статус
     """
     async with get_db_session() as session:
-        emp_data = await session.execute(
+        await session.execute(
             update(Staff)
             .where(and_(Staff.name == name, Staff.surname == surname))
             .values(status=2)
-            .returning(Staff.status)
+        )
+        emp_data = await session.execute(
+            select(Staff.status)
+            .where(and_(Staff.name == name, Staff.surname == surname))
         )
         await session.commit()
         emp = emp_data.scalar_one_or_none()
@@ -168,11 +174,14 @@ async def rm_direct(name: str, surname: str) -> bool:
     :return: int статус
     """
     async with get_db_session() as session:
-        director_data = await session.execute(
+        await session.execute(
             update(Staff)
             .where(and_(Staff.name == name, Staff.surname == surname))
             .values(status=1)
-            .returning(Staff.status)
+        )
+        director_data = await session.execute(
+            select(Staff.status)
+            .where(and_(Staff.name == name, Staff.surname == surname))
         )
         await session.commit()
         director = director_data.scalar_one_or_none()
@@ -187,11 +196,14 @@ async def rm_employee(name: str, surname: str) -> bool:
     :return: int статус
     """
     async with get_db_session() as session:
-        empl_data = await session.execute(
+        await session.execute(
             update(Staff)
             .where(and_(Staff.name == name, Staff.surname == surname))
             .values(status=1)
-            .returning(Staff.status)
+        )
+        empl_data = await session.execute(
+            select(Staff.status)
+            .where(and_(Staff.name == name, Staff.surname == surname))
         )
         await session.commit()
         employee = empl_data.scalar_one_or_none()
@@ -221,11 +233,14 @@ async def rm_non_staff(name: str, surname: str) -> bool:
     :return: None
     """
     async with get_db_session() as session:
-        empl_data = await session.execute(
+        await session.execute(
             update(Staff)
             .where(and_(Staff.name == name, Staff.surname == surname))
             .values(status=4)
-            .returning(Staff.status)
+        )
+        empl_data = await session.execute(
+            select(Staff)
+            .where(and_(Staff.name == name, Staff.surname == surname))
         )
         await session.commit()
     employee = empl_data.scalar_one_or_none()
@@ -254,15 +269,17 @@ async def return_del(name: str, surname: str) -> bool:
     """
 
     async with get_db_session() as session:
-        empl_data = await session.execute(
+        await session.execute(
             update(Staff)
             .where(and_(Staff.name == name, Staff.surname == surname))
             .values(status=1)
-            .returning(Staff.status)
+        )
+        empl_data = await session.execute(
+            select(Staff.status)
+            .where(and_(Staff.name == name, Staff.surname == surname))
         )
         await session.commit()
         employee = empl_data.scalar_one_or_none()
-    print(employee)
     return employee == 1
 
 
@@ -639,10 +656,13 @@ async def insert_organization(empl_id: int, company_name: str):
         )
         company = company_data.scalar_one_or_none()
         if company is None:
-            new_company_data = await session.execute(
+            await session.execute(
                 insert(Company)
                 .values(company_name=company_name)
-                .returning(Company)
+            )
+            new_company_data = await session.execute(
+                select(Company)
+                .where(Company.company_name==company_name)
             )
             company = new_company_data.scalar_one_or_none()
         await session.execute(
@@ -793,13 +813,21 @@ async def add_address(address: str, empl_id: int) -> list:
     check_address = await check_address_def(address=address)
     async with get_db_session() as session:
         if not check_address:
-            address_data = await session.execute(
+            await session.execute(
                 insert(Address)
                 .values(
                     address=address,
                     company_id=jobs_data.company.id,
                 )
-                .returning(Address)
+            )
+            address_data = await session.execute(
+                select(Address)
+                .where(
+                    and_(
+                        Address.address==address,
+                        Address.company_id==jobs_data.company.id,
+                    )
+                )
             )
             check_address = address_data.scalar_one_or_none()
             await session.commit()
@@ -1053,15 +1081,27 @@ async def update_company_name(empl_id: int, new_name: str):
             .limit(1)
         )
         job = job_data.scalars().first()
+        await session.execute(
+            insert(Company).values(company_name=new_name)
+        )
         new_company_data = await session.execute(
-            insert(Company).values(company_name=new_name).returning(Company)
+            select(Company).where(Company.company_name==new_name)
         )
         new_company_id = new_company_data.scalar_one().id
-        change_jobs_data = await session.execute(
+        await session.execute(
             update(ChangeJobs)
             .where(ChangeJobs.id == job.id)
             .values(company_new_id=new_company_id)
-            .returning(ChangeJobs)
+        )
+        change_jobs_data = await session.execute(
+            select(ChangeJobs)
+            .where(
+                and_(ChangeJobs.id == job.id,
+                     ChangeJobs.company_new_id==new_company_id,
+                     )
+            )
+            .order_by(desc(ChangeJobs.id))
+            .limit(1)
         )
         change_job = change_jobs_data.scalar()
         await session.execute(
@@ -1142,10 +1182,18 @@ async def update_address_for_company(
         )
         row = company_data.scalars().first()
         if new_company:
-            new_address_data = await session.execute(
+            await session.execute(
                 insert(Address)
                 .values(company_id=row.company_new_id, address=new_address)
-                .returning(Address)
+            )
+            new_address_data = await session.execute(
+                select(Address)
+                .where(
+                    and_(
+                        Address.company_id == row.company_new_id,
+                        Address.address == new_address
+                    )
+                )
             )
             new_address = new_address_data.scalar()
         else:
