@@ -53,8 +53,15 @@ async def scheduler_start():
     await asyncio.sleep(5)
     scheduler.add_job(send_message, trigger="interval", hours=1)
     scheduler.start()
-    await asyncio.Event().wait()
+    try:
+        await asyncio.Event().wait()
+    except asyncio.CancelledError:
+        scheduler.shutdown(wait=False)
+        print("Scheduler stopped")
 
 
 if __name__ == "__main__":
-    asyncio.run(scheduler_start())
+    try:
+        asyncio.run(scheduler_start())
+    except KeyboardInterrupt:
+        print("Scheduler interrupted by user")

@@ -14,7 +14,6 @@ class AdminAccessMiddleware(BaseMiddleware):
         data: Dict[str, Any],
     ) -> Any:
         allowed_ids = await self.get_allowed_ids()
-        print(allowed_ids)
         if event.from_user.id not in allowed_ids:
             await event.answer("Доступ запрещён!!!")
         else:
