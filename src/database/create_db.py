@@ -27,7 +27,7 @@ fake = Faker(locale="ru_RU")
 
 engine: AsyncEngine = create_async_engine(
     DATABASE_URL,
-    echo=True,
+    # echo=True,
     poolclass=NullPool,
 )
 
