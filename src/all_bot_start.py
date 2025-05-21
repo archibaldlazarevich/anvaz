@@ -149,13 +149,11 @@ async def start_bot_admin():
     )
     dp_admin.startup.register(set_commands_admin)
     dp_admin.message.middleware(AdminAccessMiddleware(get_allowed_ids=get_admin_id))
-    try:
-        await bot_admin.delete_webhook(drop_pending_updates=True)
-        await dp_admin.start_polling(
-            bot_admin, allowed_updates=dp_admin.resolve_used_update_types()
-        )
-    finally:
-        await bot_admin.session.close()
+    await bot_admin.delete_webhook(drop_pending_updates=True)
+    await dp_admin.start_polling(
+        bot_admin, allowed_updates=dp_admin.resolve_used_update_types()
+    )
+
 
 
 async def start_bot_dir():
@@ -173,27 +171,21 @@ async def start_bot_dir():
     dp_dir.message.middleware(
         DirectorAccessMiddleware(get_allowed_ids=get_all_dir_id)
     )
-    try:
-        await bot_dir.delete_webhook(drop_pending_updates=True)
-        await dp_dir.start_polling(
-            bot_dir, allowed_updates=dp_dir.resolve_used_update_types()
-        )
-    finally:
-        await bot_dir.session.close()
-
+    await bot_dir.delete_webhook(drop_pending_updates=True)
+    await dp_dir.start_polling(
+        bot_dir, allowed_updates=dp_dir.resolve_used_update_types()
+    )
 
 async def start_bot_register():
     dp_register.include_routers(
         router_register_start,
     )
     dp_register.startup.register(set_commands_register)
-    try:
-        await bot_register.delete_webhook(drop_pending_updates=True)
-        await dp_register.start_polling(
-            bot_register, allowed_updates=dp_register.resolve_used_update_types()
-        )
-    finally:
-        await bot_register.session.close()
+    await bot_register.delete_webhook(drop_pending_updates=True)
+    await dp_register.start_polling(
+        bot_register, allowed_updates=dp_register.resolve_used_update_types()
+    )
+
 
 async def start_bot_empl():
     dp_employee.include_routers(
@@ -208,31 +200,30 @@ async def start_bot_empl():
     dp_employee.message.middleware(
         EmployeeAccessMiddleware(get_allowed_ids=get_all_empl_id)
     )
-    try:
-        await bot_employee.delete_webhook(drop_pending_updates=True)
-        await dp_employee.start_polling(
-            bot_employee, allowed_updates=dp_employee.resolve_used_update_types()
-        )
-    finally:
-        await bot_employee.session.close()
+
+    await bot_employee.delete_webhook(drop_pending_updates=True)
+    await dp_employee.start_polling(
+        bot_employee, allowed_updates=dp_employee.resolve_used_update_types()
+    )
+
 
 async def start_bot_echo():
-    try:
-        await bot_echo.delete_webhook(drop_pending_updates=True)
-        await dp_echo.start_polling(
-            bot_echo, allowed_updates=dp_echo.resolve_used_update_types()
-        )
-    finally:
-        await bot_echo.session.close()
+    await bot_echo.delete_webhook(drop_pending_updates=True)
+    await dp_echo.start_polling(
+        bot_echo, allowed_updates=dp_echo.resolve_used_update_types()
+    )
+
 
 async def main():
-    await asyncio.gather(
-        start_bot_admin(),
-        start_bot_dir(),
-        start_bot_register(),
-        start_bot_empl(),
-        start_bot_echo(),
-    )
+    tasks = [
+        asyncio.create_task(start_bot_admin()),
+        asyncio.create_task(start_bot_dir()),
+        asyncio.create_task(start_bot_register()),
+        asyncio.create_task(start_bot_empl()),
+        asyncio.create_task(start_bot_echo()),
+    ]
+    await asyncio.gather(*tasks)
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
