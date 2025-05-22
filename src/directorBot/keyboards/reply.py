@@ -5,7 +5,7 @@ from src.database.func.data_func import (
     get_busy_empl,
     get_all_job_by_empl,
     get_busy_empl_without_spec_empl,
-    get_job_by_empl,
+    get_job_by_empl, get_all_emp,
 )
 
 
@@ -25,6 +25,21 @@ async def key_busy_employee():
         one_time_keyboard=True,
     )
 
+async def get_all_empl():
+    """
+    Функция, для составления клавиатуру со всеми работниками
+    :return:
+    """
+    all_busy_staff = await get_all_emp()
+    keyboard = ReplyKeyboardBuilder()
+    for data in all_busy_staff:
+        keyboard.add(
+            KeyboardButton(text=f"{data[0].title()} {data[1].title()}")
+        )
+    return keyboard.adjust(1).as_markup(
+        resize_keyboard=True,
+        one_time_keyboard=True,
+    )
 
 async def get_job_by_empl_name(name: str, surname: str):
     """

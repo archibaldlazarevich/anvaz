@@ -21,7 +21,7 @@ async def dir_emp_init(message: Message, state: FSMContext):
         await state.set_state(DirEmpState.init)
         await message.reply(
             "Выберите работника из списка:",
-            reply_markup=await rep.key_busy_employee(),
+            reply_markup=await rep.get_all_empl(),
         )
     else:
         await message.reply("В данный момент все работники свободны")
@@ -34,12 +34,15 @@ async def dir_emp_init(message: Message, state: FSMContext):
     job_data = await get_job_by_empl(
         name=name.lower(), surname=surname.lower()
     )
-    await message.reply(f"Действующие заявки на балансе {name} {surname}:")
-    for job in job_data:
-        await message.answer(
-            f"Заявка № {job[0]}\n"
-            f"Тип работы: {job[1].capitalize()}\n"
-            f"Организация: {job[2].capitalize()}\n"
-            f"Время поступления заявки: {job[3]}\n",
-            reply_markup=ReplyKeyboardRemove(),
-        )
+    if len(job_data) != 0:
+        await message.reply(f"Действующие заявки на балансе {name} {surname}:")
+        for job in job_data:
+            await message.answer(
+                f"Заявка № {job[0]}\n"
+                f"Тип работы: {job[1].capitalize()}\n"
+                f"Организация: {job[2].capitalize()}\n"
+                f"Время поступления заявки: {job[3]}\n",
+                reply_markup=ReplyKeyboardRemove(),
+            )
+    else:
+        await message.reply(f'В данный момент у {name} {surname} нет действующий заявок')
