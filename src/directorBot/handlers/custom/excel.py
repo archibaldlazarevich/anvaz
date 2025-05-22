@@ -41,7 +41,7 @@ async def busy_person(message: Message, state: FSMContext):
     await state.set_state(Excel.empl)
     await message.reply(
         "Выберите работника из списка:",
-        reply_markup=await rep.key_busy_employee(),
+        reply_markup=await rep.get_all_empl(),
     )
 
 

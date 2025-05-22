@@ -1,4 +1,5 @@
 import asyncio
+import os
 from datetime import datetime, timedelta
 
 from src.database.func.email_func import send_email_with_attachment
@@ -17,32 +18,36 @@ async def back_up_func():
     tomorrow = now + timedelta(days=2)
 
     is_penultimate_day = tomorrow.day == 1
-    await send_email_with_attachment(
-        subject="База данных",
-        message=f'К письму прикреплена версия базы данных за {now.strftime("%H:%M %d.%m.%Y г.")}',
-        attachment_path="base.db",
-    )
+    if 23 > now.hour > 8:
+        await send_email_with_attachment(
+            subject="База данных",
+            message=f'К письму прикреплена версия базы данных за {now.strftime("%H:%M %d.%m.%Y г.")}',
+            attachment_path="base.db",
+        )
     if now.hour == 23 and now.weekday() not in (5, 6):
-        await export_sqlalchemy_to_excel(excel_path="day_report", time=1)
+        await export_sqlalchemy_to_excel(excel_path="day_report", time=1, all_=True)
         await send_email_with_attachment(
             subject="Отчет за день",
             message=f'К письму прикреплен отчет за {now.strftime("%H:%M %d.%m.%Y г.")}',
             attachment_path="day_report.xlsx",
         )
+        os.remove("day_report.xlsx")
     if now.hour == 23 and now.weekday() == 4:
-        await export_sqlalchemy_to_excel(excel_path="week_report", time=7)
+        await export_sqlalchemy_to_excel(excel_path="week_report", time=7, all_= True)
         await send_email_with_attachment(
             subject="Отчет за неделю",
             message=f"К письму прикреплен отчет за неделю",
             attachment_path="week_report.xlsx",
         )
+        os.remove("week_report.xlsx")
     if now.hour == 23 and is_penultimate_day:
-        await export_sqlalchemy_to_excel(excel_path="month_report", time=30)
+        await export_sqlalchemy_to_excel(excel_path="month_report", time=30, all_=True)
         await send_email_with_attachment(
             subject="Отчет за месяц",
             message=f"К письму прикреплен отчет за месяц",
             attachment_path="month_report.xlsx",
         )
+        os.remove("month_report.xlsx")
 
 
 async def send_message():
