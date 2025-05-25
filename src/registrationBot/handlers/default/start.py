@@ -23,6 +23,7 @@ class RegisterStaff(StatesGroup):
 
 @router_register_start.message(CommandStart())
 async def cmd_start(message: Message, state: FSMContext) -> None:
+    await state.clear()
     async with get_db_session() as session:
         user_data = await session.execute(
             select(Staff).where(Staff.tel_id == message.from_user.id)

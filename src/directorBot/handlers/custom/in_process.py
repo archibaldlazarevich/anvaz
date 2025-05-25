@@ -1,6 +1,7 @@
 from aiogram import Router
 from aiogram.filters import Command
-from aiogram.types import Message
+from aiogram.fsm.context import FSMContext
+from aiogram.types import Message, ReplyKeyboardRemove
 
 from src.database.func.data_func import get_all_proc_jobs
 
@@ -8,9 +9,10 @@ router_in_process = Router()
 
 
 @router_in_process.message(Command("in_process"))
-async def proc_init(message: Message):
+async def proc_init(message: Message, state: FSMContext):
+    await state.clear()
     proc = await get_all_proc_jobs()
-    if len(proc) != 0:
+    if proc:
         await message.answer("В процессе работы следующие заявки:")
         for job in proc:
             await message.reply(
@@ -21,4 +23,7 @@ async def proc_init(message: Message):
                 f"Сотрудник, вполняющий заявку: {job[4].title()} {job[5].title()}\n"
             )
     else:
-        await message.reply("В данный момент нет действующих заявок")
+        await message.reply(
+            "В данный момент нет действующих заявок",
+            reply_markup=ReplyKeyboardRemove(),
+        )

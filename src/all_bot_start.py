@@ -105,6 +105,7 @@ async def set_commands_admin():
     ]
     await bot_admin.set_my_commands(commands_admin, BotCommandScopeDefault())
 
+
 async def set_commands_dir():
     commands_dir = [
         BotCommand(command=command[0], description=command[1])
@@ -112,19 +113,25 @@ async def set_commands_dir():
     ]
     await bot_dir.set_my_commands(commands_dir, BotCommandScopeDefault())
 
+
 async def set_commands_register():
     commands_register = [
         BotCommand(command=command[0], description=command[1])
         for command in DEFAULT_REGISTER_COMMAND
     ]
-    await bot_register.set_my_commands(commands_register, BotCommandScopeDefault())
+    await bot_register.set_my_commands(
+        commands_register, BotCommandScopeDefault()
+    )
+
 
 async def set_commands_empl():
     commands_employee = [
         BotCommand(command=command[0], description=command[1])
         for command in DEFAULT_EMPLOYEE_COMMANDS
     ]
-    await bot_employee.set_my_commands(commands_employee, BotCommandScopeDefault())
+    await bot_employee.set_my_commands(
+        commands_employee, BotCommandScopeDefault()
+    )
 
 
 async def start_bot_admin():
@@ -148,12 +155,13 @@ async def start_bot_admin():
         router_return_job,
     )
     dp_admin.startup.register(set_commands_admin)
-    dp_admin.message.middleware(AdminAccessMiddleware(get_allowed_ids=get_admin_id))
+    dp_admin.message.middleware(
+        AdminAccessMiddleware(get_allowed_ids=get_admin_id)
+    )
     await bot_admin.delete_webhook(drop_pending_updates=True)
     await dp_admin.start_polling(
         bot_admin, allowed_updates=dp_admin.resolve_used_update_types()
     )
-
 
 
 async def start_bot_dir():
@@ -175,6 +183,7 @@ async def start_bot_dir():
     await dp_dir.start_polling(
         bot_dir, allowed_updates=dp_dir.resolve_used_update_types()
     )
+
 
 async def start_bot_register():
     dp_register.include_routers(

@@ -6,21 +6,10 @@ from aiogram.types import Message, ReplyKeyboardRemove
 
 from config.config import ECHO_BOT
 from src.database.func.data_func import (
-    get_all_job_by_empl,
-    get_company_name,
-    insert_new_job_change,
-    update_company_name,
-    get_address_name_update,
-    update_address_for_company,
-    get_job_type_update,
-    update_job_type,
     get_new_job,
-    check_company,
     get_all_dir_id_for_echo,
-    update_company_for_task,
-    check_address_for_company,
-    change_task_by_company,
-    set_time_change,
+    get_task_all_data,
+    add_change_job,
 )
 import src.employeeBot.keyboards.reply as rep
 from src.database.func.email_func import send_email
@@ -33,144 +22,50 @@ bot = Bot(token=ECHO_BOT)
 class UpdateTask(StatesGroup):
     init: State = State()
     company: State = State()
-    new_company: State = State()
     address: State = State()
-    new_address: State = State()
     job_type: State = State()
-    new_job_type: State = State()
 
 
-@router_update_task.message(Command("update"))
-async def update_task_init(message: Message, state: FSMContext):
-    result = await get_all_job_by_empl(empl_id=message.from_user.id)
-    if not result:
-        await message.reply("У вас нет активных заявок.")
-    else:
-        await state.set_state(UpdateTask.init)
-        await message.reply(
-            "Выберите заявку, которую требуется отредактировать:",
-            reply_markup=await rep.check_task(empl_id=message.from_user.id),
-        )
-
-
-@router_update_task.message(UpdateTask.init)
-async def update_task_choose_par(message: Message, state: FSMContext):
-    task_id = int(message.text.split()[2])
-    await state.update_data(init=task_id)
-    await state.set_state(UpdateTask.company)
-    await insert_new_job_change(job_id=task_id)
-    company_name = await get_company_name(job_id=task_id)
-    await state.update_data(company=company_name)
+async def send_job(message: Message, state: FSMContext):
+    repl_data = await state.get_value("init")
     await message.reply(
-        f"Заказчик: {company_name.capitalize()}",
-        reply_markup=rep.company_choose_rep,
+        "Выберите заявку, которую требуется отредактировать:",
+        reply_markup=repl_data[1],
     )
 
 
-@router_update_task.message(F.text == "Изменить заказчика", UpdateTask.company)
-async def change_company(message: Message, state: FSMContext):
-    await state.set_state(UpdateTask.new_company)
-    company_name = await state.get_value("company")
-    check_comp_name = await rep.get_company_name_mark_without_spec(
-        company_name=company_name
-    )
-    await change_task_by_company(company_name=company_name)
-    if check_comp_name:
-        await message.reply(
-            "Введите название организации, либо выберите из списка:",
-            reply_markup=check_comp_name,
-        )
-    else:
-        await message.reply(
-            "Введите название организации:", reply_markup=ReplyKeyboardRemove()
-        )
-
-
-@router_update_task.message(
-    F.text == "Оставить старые данные", UpdateTask.company
-)
-@router_update_task.message(UpdateTask.new_company)
-async def change_address(message: Message, state: FSMContext):
-    if await state.get_state() == UpdateTask.new_company.state:
-        task_id = await state.get_value("init")
-        await state.update_data(company=message.text.lower())
-        company_data = await check_company(company_name=message.text.lower())
-        if company_data:
-            await update_company_for_task(
-                company_id=company_data.id, task_id=task_id
-            )
-            await state.update_data(new_company=False)
-        else:
-            await update_company_name(
-                empl_id=message.from_user.id, new_name=message.text.lower()
-            )
-        check_address_mark = await rep.check_address_for_update(
-            company_name=message.text.lower()
-        )
-    else:
-        check_address_mark = await rep.check_address_for_update(
-            company_name=await state.get_value("company")
-        )
-    address = await get_address_name_update(empl_id=message.from_user.id)
-    await message.reply(f"Адрес объекта:\n{address.capitalize()}")
-    await state.set_state(UpdateTask.new_address)
-    if check_address_mark:
-        await message.reply(
-            "Введите адрес объекта, либо выберите из списка:",
-            reply_markup=check_address_mark,
-        )
-    else:
-        await message.reply(
-            "Введите адрес объекта:", reply_markup=ReplyKeyboardRemove()
-        )
-
-
-@router_update_task.message(UpdateTask.new_address)
-async def change_job_type(message: Message, state: FSMContext):
-    company_name = await state.get_value("company")
-    if await check_address_for_company(
-        address=message.text.lower(), company_name=company_name
-    ):
-        await update_address_for_company(
-            new_address=message.text.lower(), empl_id=message.from_user.id
-        )
-    else:
-        await update_address_for_company(
-            new_address=message.text.lower(),
-            empl_id=message.from_user.id,
-            new_company=True,
-        )
-    type_job = await get_job_type_update(empl_id=message.from_user.id)
+async def send_org(message: Message, state: FSMContext):
+    repl_data = await state.get_value("company")
     await message.reply(
-        f"Тип работы :\n{type_job.capitalize()}",
-        reply_markup=rep.jobs_choose_rep,
+        "Выберите организацию из списка:",
+        reply_markup=repl_data[1],
     )
-    await state.set_state(UpdateTask.job_type)
 
 
-@router_update_task.message(
-    F.text == "Поменять вид работы", UpdateTask.job_type
-)
-async def choose_new_job_type(message: Message, state: FSMContext):
+async def send_address(message: Message, state: FSMContext):
+    repl_data = await state.get_value("address")
+    await message.reply("Выберите адрес из списка:", reply_markup=repl_data[1])
+
+
+async def send_task(message: Message, state: FSMContext):
+    repl_data = await state.get_value("job_type")
     await message.reply(
-        "Выберите вид выполняемых работ:",
-        reply_markup=await rep.get_all_job_type_reply(),
+        "Выберите вид работы из списка:", reply_markup=repl_data[1]
     )
-    await state.set_state(UpdateTask.new_job_type)
 
 
-@router_update_task.message(UpdateTask.new_job_type)
-@router_update_task.message(
-    F.text == "Оставить старые данные", UpdateTask.job_type
-)
-async def cancel_change(message: Message, state: FSMContext):
-    if await state.get_state() == UpdateTask.new_job_type.state:
-        await update_job_type(
-            empl_id=message.from_user.id, job_type=message.text.lower()
-        )
-    else:
-        await set_time_change(empl_id=message.from_user.id)
-    task_data = await get_new_job(empl_id=message.from_user.id)
+async def cancel_func(message: Message, state: FSMContext):
+    init_task_data = await state.get_value("init")
+    new_company = await state.get_value("company")
+    new_address = await state.get_value("address")
+    new_job = await state.get_value("job_type")
+    task_data = await add_change_job(
+        old_data=init_task_data,
+        new_company=new_company,
+        new_address=new_address,
+        new_job=new_job,
+        empl_id=message.from_user.id,
+    )
     await message.reply(
         "Завка успешно изменена:\n"
         f"Номер заяки:{task_data[0]}\n"
@@ -204,3 +99,113 @@ async def cancel_change(message: Message, state: FSMContext):
         message=text,
     )
     await state.clear()
+
+
+@router_update_task.message(Command("update"))
+async def update_task_init(message: Message, state: FSMContext):
+    await state.clear()
+    repl_data = await rep.check_task(empl_id=message.from_user.id)
+    if repl_data:
+        await state.set_state(UpdateTask.init)
+        await state.update_data(init=repl_data)
+        await send_job(message=message, state=state)
+    else:
+        await message.reply(
+            "У вас нет активных заявок.", reply_markup=ReplyKeyboardRemove()
+        )
+
+
+@router_update_task.message(UpdateTask.init)
+async def update_company(message: Message, state: FSMContext):
+    task_data = await state.get_value("init")
+    if message.text in task_data[0]:
+        repl_data = await rep.get_company_name_mark()
+        if repl_data:
+            task_id = int(message.text.split()[2])
+            task_all_data = await get_task_all_data(task_id=task_id)
+            await message.reply(
+                f"Заказчик:\n{task_data["company_data"]["name"]}",
+            )
+            await state.update_data(init=task_all_data)
+            await state.set_state(UpdateTask.company)
+            await state.update_data(company=repl_data)
+            await send_org(message=message, state=state)
+        else:
+            await message.reply(
+                "В базе данных нет доступных организаций, сообщите об этом руководителю.",
+                reply_markup=ReplyKeyboardRemove(),
+            )
+            await state.clear()
+    else:
+        await message.reply(
+            "Выберите данные из списка!!!", reply_markup=ReplyKeyboardRemove()
+        )
+        await send_job(message=message, state=state)
+
+
+@router_update_task.message(UpdateTask.company)
+async def change_company(message: Message, state: FSMContext):
+    company_data = await state.get_value("company")
+    if message.text in company_data[0]:
+        company_name = message.text.lower()
+        repl_data = await rep.check_address(company_name=company_name)
+        if repl_data:
+            init_task_data = await state.get_value("init")
+            await message.reply(
+                f"Адрес объекта:\n{init_task_data["address_data"]["name"]}",
+            )
+            await state.update_data(company=company_name)
+            await state.set_state(UpdateTask.address)
+            await state.update_data(address=repl_data)
+            await send_address(message=message, state=state)
+        else:
+            await message.reply(
+                "У данной организации нет действующих объектов, сообщите об этом руководителю.",
+                reply_markup=ReplyKeyboardRemove(),
+            )
+            await state.clear()
+    else:
+        await message.reply(
+            "Выберите данные из списка!!!", reply_markup=ReplyKeyboardRemove()
+        )
+        await send_org(message=message, state=state)
+
+
+@router_update_task.message(UpdateTask.address)
+async def change_address(message: Message, state: FSMContext):
+    address_data = await state.get_value("address")
+    if message.text in address_data[0]:
+        reply_data = rep.get_all_job_type_reply()
+        if reply_data:
+            init_task_data = await state.get_value("init")
+            await message.reply(
+                f"Вид работ:\n{init_task_data["type_data"]["name"]}",
+            )
+            await state.update_data(address=message.text.lower())
+            await state.set_state(UpdateTask.job_type)
+            await state.update_data(job_type=reply_data)
+            await send_task(message=message, state=state)
+        else:
+            await message.reply(
+                "В данный момент список доступных видов работ пуст, сообщите об этом руководителю",
+                reply_markup=ReplyKeyboardRemove(),
+            )
+            await state.clear()
+    else:
+        await message.reply(
+            "Выберите данные из списка!!!", reply_markup=ReplyKeyboardRemove()
+        )
+        await send_address(message=message, state=state)
+
+
+@router_update_task.message(UpdateTask.job_type)
+async def cancel_change(message: Message, state: FSMContext):
+    job_type_data = await state.get_value("job_type")
+    if message.text in job_type_data[0]:
+        await state.update_data(job_type=message.text.lower())
+        await cancel_func(message=message, state=state)
+    else:
+        await message.reply(
+            "Выберите данные из списка!!!", reply_markup=ReplyKeyboardRemove()
+        )
+        await send_task(message=message, state=state)

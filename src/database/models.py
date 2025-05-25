@@ -41,7 +41,7 @@ class JobType(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     job_name: Mapped[str] = mapped_column(String, nullable=True)
     number_tasks: Mapped[int] = mapped_column(Integer, nullable=True)
-    active: Mapped[int] = mapped_column(Integer, nullable=True)
+    active: Mapped[int] = mapped_column(Integer, nullable=True, default=1)
     jobs = relationship("Jobs", back_populates="type")
     change_old = relationship(
         "ChangeJobs",
@@ -82,7 +82,7 @@ class Jobs(Base):
         nullable=True,
     )
     time_add: Mapped[datetime.datetime] = mapped_column(
-        DateTime, default=datetime.datetime.today()
+        DateTime, default=datetime.datetime.now
     )
     time_close: Mapped[datetime.datetime] = mapped_column(
         DateTime, nullable=True
@@ -190,6 +190,7 @@ class Company(Base):
         String, nullable=False, unique=True
     )
     tasks: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    status: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     jobs = relationship("Jobs", back_populates="company")
     change_old = relationship(
         "ChangeJobs",
@@ -219,6 +220,7 @@ class Address(Base):
     company_id: Mapped[int] = mapped_column(
         ForeignKey("company.id"), nullable=False
     )
+    status: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     company = relationship("Company", back_populates="address")
     jobs = relationship("Jobs", back_populates="address")
     change_old = relationship(

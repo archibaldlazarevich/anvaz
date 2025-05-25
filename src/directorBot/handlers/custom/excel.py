@@ -1,4 +1,3 @@
-import asyncio
 import os
 
 from aiogram import Router, F
@@ -12,6 +11,8 @@ import src.directorBot.keyboards.reply as rep
 
 router_dir_excel = Router()
 
+all_data = ["Все сотрудники", "Определённый сотрудник"]
+
 
 class Excel(StatesGroup):
     init: State = State()
@@ -20,54 +21,130 @@ class Excel(StatesGroup):
     period: State = State()
 
 
-@router_dir_excel.message(Command("excel"))
-async def busy_init(message: Message, state: FSMContext):
+async def send_spec_empl(message: Message, state: FSMContext):
+    """
+    Функция отправляет клавиатуру с выбором определенного сотрудника
+    :param message:
+    :param state:
+    :return:
+    """
+    repl_data = await state.get_value("empl")
+    await message.reply(
+        "Выберите работника из списка:",
+        reply_markup=repl_data[1],
+    )
+
+
+async def send_type(message: Message, state: FSMContext):
+    """
+    Функция отправляет клавиатуру с выбором типа заявки
+    :param message:
+    :param state:
+    :return:
+    """
+    repl_data = await state.get_value("task")
+    await message.reply("Выберите тип заявки", reply_markup=repl_data[1])
+
+
+async def send_period(message: Message, state: FSMContext):
+    """
+    Функция отправляет клавиатуру с выбором периода дял отчета
+    :param message:
+    :param state:
+    :return:
+    """
+    repl_data = await state.get_value("period")
+    await message.reply(
+        "Выбрите период, для которого составить отчет",
+        reply_markup=repl_data[1],
+    )
+    pass
+
+
+async def start_command(message: Message, state: FSMContext):
+    await state.clear()
     await state.set_state(Excel.init)
     await message.reply(
         "Выберите необходимый пункт меню", reply_markup=rep.employee
     )
 
 
+@router_dir_excel.message(Command("excel"))
+async def busy_init(message: Message, state: FSMContext):
+    await start_command(message=message, state=state)
+
+
+@router_dir_excel.message(F.text not in all_data, Excel.init)
+async def check(message: Message, state: FSMContext):
+    await message.reply(
+        "Выберите данные из списка!!!", reply_markup=ReplyKeyboardRemove()
+    )
+    await start_command(message=message, state=state)
+
+
 @router_dir_excel.message(F.text == "Все сотрудники", Excel.init)
 async def busy_next(message: Message, state: FSMContext):
     await state.update_data(init=message.text)
     await state.set_state(Excel.task)
-    await message.reply("Выберите тип заявки", reply_markup=rep.task_choice)
+    repl_data = await rep.task_choice()
+    await state.update_data(task=repl_data)
+    await send_type(message=message, state=state)
 
 
 @router_dir_excel.message(F.text == "Определённый сотрудник", Excel.init)
 async def busy_person(message: Message, state: FSMContext):
     await state.update_data(init=message.text)
     await state.set_state(Excel.empl)
-    await message.reply(
-        "Выберите работника из списка:",
-        reply_markup=await rep.get_all_empl(),
-    )
+    repl_data = await rep.get_all_empl()
+    await state.update_data(empl=repl_data)
+    await send_spec_empl(message=message, state=state)
 
 
 @router_dir_excel.message(Excel.empl)
 async def busy_person_answer(message: Message, state: FSMContext):
-    name, surname = message.text.split()
-    await state.update_data(empl=(name.lower(), surname.lower()))
-    await state.set_state(Excel.task)
-    await message.reply("Выберите тип заявки", reply_markup=rep.task_choice)
+    empl_data = await state.get_value("empl")
+    if message.text in empl_data[0]:
+        name, surname = message.text.split()
+        await state.update_data(empl=(name.lower(), surname.lower()))
+        await state.set_state(Excel.task)
+        repl_data = await rep.task_choice()
+        await state.update_data(task=repl_data)
+        await send_type(message=message, state=state)
+    else:
+        await message.reply(
+            "Выберите данные из списка!!!", reply_markup=ReplyKeyboardRemove()
+        )
+        await send_spec_empl(message=message, state=state)
 
 
 @router_dir_excel.message(Excel.task)
 async def choice_task(message: Message, state: FSMContext):
-    await state.update_data(task=message.text)
-    await state.set_state(Excel.period)
-    await message.reply(
-        "Выбрите период, для которого составить отчет",
-        reply_markup=rep.time_choice,
-    )
+    task_data = await state.get_value("task")
+    if message.text in task_data[0]:
+        await state.update_data(task=message.text)
+        await state.set_state(Excel.period)
+        repl_data = await rep.time_choice()
+        await state.update_data(period=repl_data)
+        await send_period(message=message, state=state)
+    else:
+        await message.reply(
+            "Выберите данные из списка!!!", reply_markup=ReplyKeyboardRemove()
+        )
+        await send_type(message=message, state=state)
 
 
 @router_dir_excel.message(Excel.period)
 async def choice_period(message: Message, state: FSMContext):
-    state_data = await state.update_data(period=message.text)
-    await state.clear()
-    await answer(message=message, data=state_data)
+    period_data = await state.get_value("period")
+    if message.text in period_data[0]:
+        state_data = await state.update_data(period=message.text)
+        await state.clear()
+        await answer(message=message, data=state_data)
+    else:
+        await message.reply(
+            "Выберите данные из списка!!!", reply_markup=ReplyKeyboardRemove()
+        )
+        await send_period(message=message, state=state)
 
 
 async def answer(message: Message, data: dict):

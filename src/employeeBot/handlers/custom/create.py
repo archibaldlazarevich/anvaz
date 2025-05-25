@@ -1,5 +1,3 @@
-from pyexpat.errors import messages
-
 from aiogram import Bot, Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
@@ -8,12 +6,8 @@ from aiogram.types import Message, ReplyKeyboardRemove
 
 from config.config import ECHO_BOT
 from src.database.func.data_func import (
-    insert_job_type,
-    insert_organization,
-    create_new_task,
-    add_address,
-    check_job,
     get_all_dir_id_for_echo,
+    add_new_job,
 )
 from src.database.func.email_func import send_email
 import src.employeeBot.keyboards.reply as rep
@@ -29,70 +23,35 @@ class CreateTask(StatesGroup):
     create_address: State = State()
 
 
-@router_create_task.message(Command("create"))
-async def create_init(message: Message, state: FSMContext):
-    await state.set_state(CreateTask.create_org)
-    await create_new_task(empl_id=message.from_user.id)
-    check_comp_name = await rep.get_company_name_mark()
-    if check_comp_name:
-        await message.reply(
-            "Введите название организации, либо выберите из списка",
-            reply_markup=check_comp_name,
-        )
-    else:
-        await message.reply(
-            "Введите название организации",
-        )
-
-
-async def process_create_task(
-    message: Message, state: FSMContext, create=True
-):
-    if create:
-        await state.set_state(CreateTask.create_task)
-        await insert_organization(
-            company_name=message.text.lower(), empl_id=message.from_user.id
-        )
+async def send_org(message: Message, state: FSMContext):
+    repl_data = await state.get_value("create_org")
     await message.reply(
-        "Выберите вид выполняемых работ",
-        reply_markup=await rep.get_all_job_type_reply(),
+        "Выберите организаию из списка:",
+        reply_markup=repl_data[1],
     )
 
 
-@router_create_task.message(CreateTask.create_org)
-async def create_task(message: Message, state: FSMContext):
-    await process_create_task(message=message, state=state)
+async def send_address(message: Message, state: FSMContext):
+    repl_data = await state.get_value("create_address")
+    await message.reply("Выберите адрес из списка:", reply_markup=repl_data[1])
 
 
-@router_create_task.message(CreateTask.create_task)
-async def create_address(message: Message, state: FSMContext):
-    if await check_job(job_name=message.text.lower()):
-        await state.set_state(CreateTask.create_address)
-        await insert_job_type(
-            job_type=message.text.lower(), empl_id=message.from_user.id
-        )
-        check_address_mark = await rep.check_address(
-            empl_id=message.from_user.id
-        )
-        if check_address_mark:
-            await message.reply(
-                "Введите адрес объекта, либо выберите из списка",
-                reply_markup=check_address_mark,
-            )
-        else:
-            await message.reply(
-                "Введите адрес объекта", reply_markup=ReplyKeyboardRemove()
-            )
-    else:
-        await message.reply("Выберите вид работ из списка!!!")
-        await process_create_task(message=message, state=state, create=False)
+async def send_task(message: Message, state: FSMContext):
+    repl_data = await state.get_value("create_task")
+    await message.reply(
+        "Выберите вид работы из списка:", reply_markup=repl_data[1]
+    )
 
 
-@router_create_task.message(CreateTask.create_address)
-async def answer_to_user(message: Message, state: FSMContext):
-    await state.clear()
-    task_data = await add_address(
-        address=message.text.lower(), empl_id=message.from_user.id
+async def cancel_func(message: Message, state: FSMContext):
+    address_data = await state.get_value("create_address")
+    task_data = await state.get_value("create_task")
+    company_name = await state.get_value("create_org")
+    task_data = await add_new_job(
+        empl_id=message.from_user.id,
+        address_name=address_data,
+        job_name=task_data,
+        company_name=company_name,
     )
     await message.reply(
         "Заявка успешно добавлена:\n"
@@ -117,3 +76,79 @@ async def answer_to_user(message: Message, state: FSMContext):
         subject=f"Новая заявка от сотрудника {task_data[4].title()} {task_data[3].title()}",
         message=text,
     )
+    await state.clear()
+
+
+@router_create_task.message(Command("create"))
+async def create_init(message: Message, state: FSMContext):
+    await state.clear()
+    repl_data = await rep.get_company_name_mark()
+    if repl_data:
+        await state.set_state(CreateTask.create_org)
+        await state.update_data(create_org=repl_data)
+        await send_org(message=message, state=state)
+    else:
+        await message.reply(
+            "В базе данных нет доступных организаций, сообщите об этом руководителю.",
+            reply_markup=ReplyKeyboardRemove(),
+        )
+
+
+@router_create_task.message(CreateTask.create_org)
+async def create_address_func(message: Message, state: FSMContext):
+    org_data = await state.get_value("create_org")
+    if message.text in org_data[0]:
+        company_data = message.text.lower()
+        repl_data = await rep.check_address(company_name=company_data)
+        if repl_data:
+            await state.update_data(create_org=company_data)
+            await state.set_state(CreateTask.create_address)
+            await state.update_data(create_address=repl_data)
+            await send_address(message=message, state=state)
+        else:
+            await message.reply(
+                "У данной организации нет действующих объектов, сообщите об этом руководителю.",
+                reply_markup=ReplyKeyboardRemove(),
+            )
+            await state.clear()
+    else:
+        await message.reply(
+            "Выберите данные из списка!!!", reply_markup=ReplyKeyboardRemove()
+        )
+        await send_org(message=message, state=state)
+
+
+@router_create_task.message(CreateTask.create_address)
+async def create_task(message: Message, state: FSMContext):
+    repl_data = await state.get_value("create_address")
+    if message.text in repl_data[0]:
+        reply_data = rep.get_all_job_type_reply()
+        if reply_data:
+            await state.update_data(create_address=message.text.lower())
+            await state.set_state(CreateTask.create_task)
+            await state.update_data(create_task=reply_data)
+            await send_task(message=message, state=state)
+        else:
+            await message.reply(
+                "В данный момент список доступных видов работ пуст, сообщите об этом руководителю",
+                reply_markup=ReplyKeyboardRemove(),
+            )
+            await state.clear()
+    else:
+        await message.reply(
+            "Выберите данные из списка!!!", reply_markup=ReplyKeyboardRemove()
+        )
+        await send_address(message=message, state=state)
+
+
+@router_create_task.message(CreateTask.create_task)
+async def answer_to_user(message: Message, state: FSMContext):
+    repl_data = await state.get_value("create_task")
+    if message.text in repl_data[0]:
+        await state.update_data(create_task=message.text.lower())
+        await cancel_func(message=message, state=state)
+    else:
+        await message.reply(
+            "Выберите данные из списка!!!", reply_markup=ReplyKeyboardRemove()
+        )
+        await send_task(message=message, state=state)

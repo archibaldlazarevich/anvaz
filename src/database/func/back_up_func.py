@@ -25,7 +25,9 @@ async def back_up_func():
             attachment_path="base.db",
         )
     if now.hour == 23 and now.weekday() not in (5, 6):
-        await export_sqlalchemy_to_excel(excel_path="day_report", time=1, all_=True)
+        await export_sqlalchemy_to_excel(
+            excel_path="day_report", time=1, all_=True
+        )
         await send_email_with_attachment(
             subject="Отчет за день",
             message=f'К письму прикреплен отчет за {now.strftime("%H:%M %d.%m.%Y г.")}',
@@ -33,7 +35,9 @@ async def back_up_func():
         )
         os.remove("day_report.xlsx")
     if now.hour == 23 and now.weekday() == 4:
-        await export_sqlalchemy_to_excel(excel_path="week_report", time=7, all_= True)
+        await export_sqlalchemy_to_excel(
+            excel_path="week_report", time=7, all_=True
+        )
         await send_email_with_attachment(
             subject="Отчет за неделю",
             message=f"К письму прикреплен отчет за неделю",
@@ -41,7 +45,9 @@ async def back_up_func():
         )
         os.remove("week_report.xlsx")
     if now.hour == 23 and is_penultimate_day:
-        await export_sqlalchemy_to_excel(excel_path="month_report", time=30, all_=True)
+        await export_sqlalchemy_to_excel(
+            excel_path="month_report", time=30, all_=True
+        )
         await send_email_with_attachment(
             subject="Отчет за месяц",
             message=f"К письму прикреплен отчет за месяц",
