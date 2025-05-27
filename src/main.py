@@ -5,9 +5,11 @@ import time
 
 processes = []
 
+
 def run_script(script_name):
     p = subprocess.Popen(["python", "-m", script_name])
     processes.append(p)
+
 
 def terminate_processes():
     for p in processes:
@@ -27,6 +29,7 @@ def terminate_processes():
     # Ждем завершения всех процессов
     for p in processes:
         p.wait()
+
 
 if __name__ == "__main__":
     try:

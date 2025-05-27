@@ -17,6 +17,7 @@ class RetNonStaff(StatesGroup):
 
 @router_return_non_staff.message(Command("return_non_staff"))
 async def add_dir_init(message: Message, state: FSMContext):
+    await state.clear()
     repl_data = await rep.check_del_staff()
     if repl_data:
         await state.set_state(RetNonStaff.init)
@@ -26,16 +27,23 @@ async def add_dir_init(message: Message, state: FSMContext):
         )
     else:
         await message.reply(
-            "В данный момент неактивных пользователей нет в базе данных."
+            "В данный момент неактивных пользователей нет в базе данных.",
+            reply_markup=ReplyKeyboardRemove(),
         )
 
 
 @router_return_non_staff.message(RetNonStaff.init)
 async def add_dir_choice(message: Message, state: FSMContext):
-    await state.clear()
     name, surname = message.text.split()
-    await return_del(name=name.lower(), surname=surname.lower())
-    await message.reply(
-        f"Пользователь {name} {surname} переведен в неактивные",
-        reply_markup=ReplyKeyboardRemove(),
-    )
+    if await return_del(name=name.lower(), surname=surname.lower()):
+        await message.reply(
+            f"Пользователь {name} {surname} переведен в неактивные",
+            reply_markup=ReplyKeyboardRemove(),
+        )
+    else:
+        await message.reply(
+            "Вы ввели несуществующего пользователя,"
+            " пожалуйста выберите пользователя из списка.",
+            reply_markup=ReplyKeyboardRemove(),
+        )
+    await state.clear()
