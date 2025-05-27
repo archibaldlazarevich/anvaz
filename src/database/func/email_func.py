@@ -7,7 +7,7 @@
 # import os
 # import requests
 from aiogram import Bot
-from aiogram.types import FSInputFile
+from aiogram.types import FSInputFile, Message
 
 from config.config import  ECHO_BOT
 from src.database.func.data_func import get_all_dir_id_for_echo, get_admin_id
