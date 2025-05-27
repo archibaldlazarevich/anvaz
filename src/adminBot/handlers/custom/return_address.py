@@ -37,7 +37,7 @@ async def send_address(message: Message, state: FSMContext, company_name: str):
             "Нет доступных адресов для этой компании",
             reply_markup=ReplyKeyboardRemove(),
         )
-    await state.clear()
+        await state.clear()
 
 
 @router_return_address.message(Command("return_address"))
@@ -93,7 +93,7 @@ async def rm_address_cancel(message: Message, state: FSMContext):
         await send_address(
             message=message, state=state, company_name=company_name
         )
-    if check_address:
+    else:
         await return_address(company_name=company_name, address=address)
         await message.reply(
             "Адрес переведен в активные", reply_markup=ReplyKeyboardRemove()

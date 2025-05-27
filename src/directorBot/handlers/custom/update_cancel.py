@@ -34,16 +34,15 @@ async def get_all_model_car(message: Message, state: FSMContext):
 async def cancel_get_all_model_car(message: Message, state: FSMContext):
     await state.clear()
     if await check_if_update(dir_id=message.from_user.id):
-        await cancel_update(dir_id=message.from_user.id)
         await message.reply(
             "Поступление данных о новых заявках остановлено.\n"
             "Для возобновления введите команду: \n/update",
             reply_markup=ReplyKeyboardRemove(),
         )
+        await cancel_update(dir_id=message.from_user.id)
     else:
         await message.reply(
             "Вы не включили функцию доставки новых и обновленных старых заявок.\n"
             "Для запуска функции введите команду: \n/update",
             reply_markup=ReplyKeyboardRemove(),
         )
-        await cancel_update(dir_id=message.from_user.id)

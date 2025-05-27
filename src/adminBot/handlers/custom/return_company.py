@@ -34,10 +34,10 @@ async def return_company(message: Message, state: FSMContext):
 
 @router_return_company.message(RetComp.init)
 async def return_company_choice(message: Message, state: FSMContext):
-    await state.clear()
     if await return_del_company(company_name=message.text.lower()):
         await message.reply(
-            f"Компания '{message.text.capitalize()}' переведена в активные, и все адреса, привязанные к этой компании вовращены в активные",
+            f"Компания '{message.text.capitalize()}' переведена в активные, и все адреса, "
+            f"привязанные к этой компании вовращены в активные",
             reply_markup=ReplyKeyboardRemove(),
         )
     else:
@@ -45,3 +45,4 @@ async def return_company_choice(message: Message, state: FSMContext):
             "Введеная вами компания отсутствует в базе данный, пожалуйста выберите нужную из списка.",
             reply_markup=ReplyKeyboardRemove(),
         )
+    await state.clear()

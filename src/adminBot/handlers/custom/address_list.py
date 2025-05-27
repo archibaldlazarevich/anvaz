@@ -47,14 +47,22 @@ async def check_company_command(message: Message, state: FSMContext):
             "чтобы сделать ее активной, воспользуйтесь командой \n/return_company",
             reply_markup=ReplyKeyboardRemove(),
         )
+        await state.clear()
     elif check_company_data:
         address_company = await get_all_address_for_company(company_name)
-        for address in address_company:
-            await message.answer(text=address)
+        if address_company:
+            await message.reply(
+                f"В базе данных находятся следующие адреса для {message.text}:",
+                reply_markup=ReplyKeyboardRemove(),
+            )
+            for address in address_company:
+                await message.answer(text=address.capitalize(), reply_markup=ReplyKeyboardRemove(),)
+        else:
+            await message.reply('У этой компании в данный момент нет активных адресов')
+        await state.clear()
     else:
         await message.reply(
             "Пожалуйста, выберите данные из списка!!!",
             reply_markup=ReplyKeyboardRemove(),
         )
         await send_company(message=message, state=state)
-        await state.clear()

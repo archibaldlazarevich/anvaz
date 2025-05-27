@@ -8,9 +8,10 @@ from config.config import EMPLOYEE_BOT
 from src.database.func.data_func import (
     set_new_empl_for_job,
     get_busy_empl_without_spec_empl,
+    get_tel_id,
 )
 import src.directorBot.keyboards.reply as rep
-from src.database.func.email_func import send_email
+# from src.database.func.email_func import send_email
 
 router_change = Router()
 
@@ -30,7 +31,7 @@ async def send_empl(message: Message, state: FSMContext):
 
 async def send_job(message: Message, state: FSMContext):
     repl_job = await state.get_value("change_empl")
-    name, surname = state.get_value("init")
+    name, surname = await state.get_value("init")
     await message.reply(
         f"Выберите заявку {name} {surname},\n"
         f"которую вы хотите переместить на другого работника:",
@@ -38,7 +39,7 @@ async def send_job(message: Message, state: FSMContext):
     )
 
 
-async def change_empl(message: Message, state: FSMContext):
+async def change_empl_(message: Message, state: FSMContext):
     repl_data = await state.get_value("change_empl")
     await message.reply(
         "Выберите работника, которому вы хотите поручить заявку из списка:",
@@ -103,7 +104,7 @@ async def new_empl(message: Message, state: FSMContext):
         if repl_busy_data:
             await state.set_state(ChangeEmpl.update)
             await state.update_data(update=int(message.text.split()[2]))
-            await change_empl(message=message, state=state)
+            await change_empl_(message=message, state=state)
         else:
             await message.reply("В базе данных нет других сотудников.")
     else:
@@ -117,6 +118,8 @@ async def new_empl(message: Message, state: FSMContext):
 async def cancel_update(message: Message, state: FSMContext):
     empl_data = await state.get_value("change_empl")
     if message.text in empl_data[0]:
+        name_old, surname_old = await state.get_value("init")
+        empl_id = await get_tel_id(name= name_old, surname= surname_old)
         name, surname = message.text.split()
         task_id = await state.get_value("update")
         new_task_data = await set_new_empl_for_job(
@@ -130,19 +133,31 @@ async def cancel_update(message: Message, state: FSMContext):
             f"Время поступления заявки: {new_task_data[3]}\n"
             f"Ответсвенный работник: {new_task_data[5].capitalize()} {new_task_data[6].capitalize()}"
         )
+        text_old = (
+            f"Обратите внимание, теперь за заявкой №{new_task_data[0]}\n"
+            f"закреплен другой сотрудник, полная информаци:\n"
+            f"Заявка № {new_task_data[0]}\n"
+            f"Тип работы: {new_task_data[1].capitalize()}\n"
+            f"Организация: {new_task_data[2].capitalize()}\n"
+            f"Время поступления заявки: {new_task_data[3]}\n"
+            f"Ответсвенный работник: {new_task_data[5].capitalize()} {new_task_data[6].capitalize()}"
+        )
+        await state.clear()
         await message.reply(text=text, reply_markup=ReplyKeyboardRemove())
         await bot.send_message(
             text=text,
             chat_id=new_task_data[4],
         )
-        await send_email(
-            subject=f"Сотрудник {new_task_data[5].capitalize()} {new_task_data[6].capitalize()}"
-            f" переназначен ответсвенным за заявку № {new_task_data[0]}",
-            message=text,
+        await bot.send_message(
+            text= text_old, chat_id=empl_id
         )
-        await state.clear()
+        # await send_email(
+        #     subject=f"Сотрудник {new_task_data[5].capitalize()} {new_task_data[6].capitalize()}"
+        #     f" переназначен ответсвенным за заявку № {new_task_data[0]}",
+        #     message=text,
+        # )
     else:
         await message.reply(
             "Выберите данные из списка!!!", reply_markup=ReplyKeyboardRemove()
         )
-        await change_empl(message=message, state=state)
+        await change_empl_(message=message, state=state)

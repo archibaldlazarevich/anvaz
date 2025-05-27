@@ -26,7 +26,7 @@ async def add_dir_init(message: Message, state: FSMContext):
 @router_add_jobs.message(AddJob.init)
 async def add_dir_choice(message: Message, state: FSMContext):
     job = message.text
-    if await check_job(job_name=job.lower()):
+    if not await check_job(job_name=job.lower()):
         await state.clear()
         await add_job(job_name=job.lower())
         await message.reply(

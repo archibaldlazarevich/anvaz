@@ -26,34 +26,34 @@ async def back_up_func():
         )
     if now.hour == 23 and now.weekday() not in (5, 6):
         await export_sqlalchemy_to_excel(
-            excel_path="day_report", time=1, all_=True
+            excel_path="day", time=1, all_=True
         )
         await send_email_with_attachment(
             subject="Отчет за день",
             message=f'К письму прикреплен отчет за {now.strftime("%H:%M %d.%m.%Y г.")}',
-            attachment_path="day_report.xlsx",
+            attachment_path="day.xlsx",
         )
-        os.remove("day_report.xlsx")
+        os.remove("day.xlsx")
     if now.hour == 23 and now.weekday() == 4:
         await export_sqlalchemy_to_excel(
-            excel_path="week_report", time=7, all_=True
+            excel_path="week", time=7, all_=True
         )
         await send_email_with_attachment(
             subject="Отчет за неделю",
             message=f"К письму прикреплен отчет за неделю",
-            attachment_path="week_report.xlsx",
+            attachment_path="week.xlsx",
         )
-        os.remove("week_report.xlsx")
+        os.remove("week.xlsx")
     if now.hour == 23 and is_penultimate_day:
         await export_sqlalchemy_to_excel(
-            excel_path="month_report", time=30, all_=True
+            excel_path="month", time=30, all_=True
         )
         await send_email_with_attachment(
             subject="Отчет за месяц",
             message=f"К письму прикреплен отчет за месяц",
-            attachment_path="month_report.xlsx",
+            attachment_path="month.xlsx",
         )
-        os.remove("month_report.xlsx")
+        os.remove("month.xlsx")
 
 
 async def send_message():
@@ -62,7 +62,7 @@ async def send_message():
 
 async def scheduler_start():
     await asyncio.sleep(5)
-    scheduler.add_job(send_message, trigger="interval", hours=1)
+    scheduler.add_job(send_message, trigger="interval", minutes=1)
     scheduler.start()
     try:
         await asyncio.Event().wait()

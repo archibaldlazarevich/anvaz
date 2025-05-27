@@ -58,7 +58,6 @@ async def send_period(message: Message, state: FSMContext):
         "Выбрите период, для которого составить отчет",
         reply_markup=repl_data[1],
     )
-    pass
 
 
 async def start_command(message: Message, state: FSMContext):
@@ -74,7 +73,7 @@ async def busy_init(message: Message, state: FSMContext):
     await start_command(message=message, state=state)
 
 
-@router_dir_excel.message(F.text not in all_data, Excel.init)
+@router_dir_excel.message(F.text.not_in(all_data), Excel.init)
 async def check(message: Message, state: FSMContext):
     await message.reply(
         "Выберите данные из списка!!!", reply_markup=ReplyKeyboardRemove()

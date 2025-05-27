@@ -12,7 +12,7 @@ from src.database.func.data_func import (
     get_all_dir_id_for_echo,
 )
 import src.employeeBot.keyboards.reply as rep
-from src.database.func.email_func import send_email
+# from src.database.func.email_func import send_email
 
 router_close_task = Router()
 
@@ -76,10 +76,10 @@ async def close_task(message: Message, state: FSMContext):
                 text=text,
                 chat_id=dir_id,
             )
-        await send_email(
-            subject=f"Сотрудник {task_data[5].title()} {task_data[6].title()}  выполнил заявку № {task_data[0]}",
-            message=text,
-        )
+        # await send_email(
+        #     subject=f"Сотрудник {task_data[5].title()} {task_data[6].title()}  выполнил заявку № {task_data[0]}",
+        #     message=text,
+        # )
     else:
         await message.reply(
             "Выберите данные из списка!!!", reply_markup=ReplyKeyboardRemove()

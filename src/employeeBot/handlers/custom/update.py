@@ -6,13 +6,12 @@ from aiogram.types import Message, ReplyKeyboardRemove
 
 from config.config import ECHO_BOT
 from src.database.func.data_func import (
-    get_new_job,
     get_all_dir_id_for_echo,
     get_task_all_data,
     add_change_job,
 )
 import src.employeeBot.keyboards.reply as rep
-from src.database.func.email_func import send_email
+# from src.database.func.email_func import send_email
 
 router_update_task = Router()
 
@@ -66,12 +65,13 @@ async def cancel_func(message: Message, state: FSMContext):
         new_job=new_job,
         empl_id=message.from_user.id,
     )
+    await state.clear()
     await message.reply(
         "Завка успешно изменена:\n"
         f"Номер заяки:{task_data[0]}\n"
         f"Тип работы: {task_data[1][1].capitalize()}\n"
         f"Заказчик: {task_data[2][1].capitalize()}\n"
-        f"Адресс объекта: {task_data[3][1].capitalize()}",
+        f"Адрес объекта: {task_data[3][1].capitalize()}",
         reply_markup=ReplyKeyboardRemove(),
     )
     text = (
@@ -79,14 +79,14 @@ async def cancel_func(message: Message, state: FSMContext):
         f"Номер заявки: {task_data[0]}\n"
         f"Тип работы: {task_data[1][0].capitalize()}\n"
         f"Заказчик до изменения: {task_data[2][0].capitalize()}\n"
-        f"Адресс до изменения: {task_data[3][0].capitalize()}\n"
+        f"Адрес до изменения: {task_data[3][0].capitalize()}\n"
         f"Время регистрации первоначальной заявки {task_data[4][0]}\n\n"
         f"На новые данные:\n"
         f"Номер заявки: {task_data[0]}\n"
         f"Тип работы: {task_data[1][1].capitalize()}\n"
         f"Заказчик после изменения: {task_data[2][1].capitalize()}\n"
-        f"Адресс после изменения: {task_data[3][1].capitalize()}\n"
-        f"Время регистрации последнего изменения заявки {task_data[4][1]}\n"
+        f"Адрес после изменения: {task_data[3][1].capitalize()}\n"
+        f"Время регистрации последнего изменения заявки {task_data[4][1]}"
     )
     dir_all_id = await get_all_dir_id_for_echo()
     for dir_id in dir_all_id:
@@ -94,11 +94,10 @@ async def cancel_func(message: Message, state: FSMContext):
             text=text,
             chat_id=dir_id,
         )
-    await send_email(
-        subject=f"{task_data[5][1].title()} {task_data[5][0].title()} изменил заявку № {task_data[0]}",
-        message=text,
-    )
-    await state.clear()
+    # await send_email(
+    #     subject=f"{task_data[5][1].title()} {task_data[5][0].title()} изменил заявку № {task_data[0]}",
+    #     message=text,
+    # )
 
 
 @router_update_task.message(Command("update"))
@@ -124,7 +123,7 @@ async def update_company(message: Message, state: FSMContext):
             task_id = int(message.text.split()[2])
             task_all_data = await get_task_all_data(task_id=task_id)
             await message.reply(
-                f"Заказчик:\n{task_data["company_data"]["name"]}",
+                f"Заказчик:\n{task_all_data["company_data"]['name']}",
             )
             await state.update_data(init=task_all_data)
             await state.set_state(UpdateTask.company)
@@ -175,7 +174,7 @@ async def change_company(message: Message, state: FSMContext):
 async def change_address(message: Message, state: FSMContext):
     address_data = await state.get_value("address")
     if message.text in address_data[0]:
-        reply_data = rep.get_all_job_type_reply()
+        reply_data = await rep.get_all_job_type_reply()
         if reply_data:
             init_task_data = await state.get_value("init")
             await message.reply(

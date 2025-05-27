@@ -189,7 +189,7 @@ class Company(Base):
     company_name: Mapped[str] = mapped_column(
         String, nullable=False, unique=True
     )
-    tasks: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    tasks: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     status: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     jobs = relationship("Jobs", back_populates="company")
     change_old = relationship(

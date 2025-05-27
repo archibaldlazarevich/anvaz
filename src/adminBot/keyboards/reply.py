@@ -28,7 +28,10 @@ async def check_staff():
         ]
         for data in all_data:
             keyboard.add(KeyboardButton(text=data))
-        markup = keyboard.adjust(1).as_markup(resize_keyboard=True)
+        markup = keyboard.adjust(1).as_markup(
+            resize_keyboard=True,
+            one_time_keyboard=True,
+        )
         return all_data, markup
     return False
 
@@ -44,8 +47,11 @@ async def check_address(company_name: str):
     keyboard = ReplyKeyboardBuilder()
     if all_address_data:
         for data in all_address_data:
-            keyboard.add(KeyboardButton(text=f"{data[0].capitalize()}"))
-        return keyboard.adjust(1).as_markup(resize_keyboard=True)
+            keyboard.add(KeyboardButton(text=f"{data.capitalize()}"))
+        return keyboard.adjust(1).as_markup(
+            resize_keyboard=True,
+            one_time_keyboard=True,
+        )
     return False
 
 
@@ -60,8 +66,11 @@ async def check_ban_address(company_name: str):
     keyboard = ReplyKeyboardBuilder()
     if all_address_data:
         for data in all_address_data:
-            keyboard.add(KeyboardButton(text=f"{data[0].capitalize()}"))
-        return keyboard.adjust(1).as_markup(resize_keyboard=True)
+            keyboard.add(KeyboardButton(text=f"{data.capitalize()}"))
+        return keyboard.adjust(1).as_markup(
+            resize_keyboard=True,
+            one_time_keyboard=True,
+        )
     return False
 
 
@@ -73,9 +82,9 @@ async def check_company():
     all_company_data = await get_all_company_name()
     keyboard = ReplyKeyboardBuilder()
     if all_company_data:
-        all_data = [data[0] for data in all_company_data]
+        all_data = [data for data in all_company_data]
         for data in all_data:
-            keyboard.add(KeyboardButton(text=f"{data.capitalize()}"))
+            keyboard.add(KeyboardButton(text=data))
         markup = keyboard.adjust(1).as_markup(
             resize_keyboard=True,
             one_time_keyboard=True,
@@ -97,7 +106,10 @@ async def check_dir():
         ]
         for data in all_data:
             keyboard.add(KeyboardButton(text=data))
-        markup = keyboard.adjust(1).as_markup(resize_keyboard=True)
+        markup = keyboard.adjust(1).as_markup(
+            resize_keyboard=True,
+            one_time_keyboard=True,
+        )
         return all_data, markup
     return False
 
@@ -115,7 +127,10 @@ async def check_empl():
         ]
         for data in all_data:
             keyboard.add(KeyboardButton(text=data))
-        markup = keyboard.adjust(1).as_markup(resize_keyboard=True)
+        markup = keyboard.adjust(1).as_markup(
+            resize_keyboard=True,
+            one_time_keyboard=True,
+        )
         return all_data, markup
     return False
 
@@ -128,10 +143,13 @@ async def check_job():
     all_job_data = await get_all_jobs()
     keyboard = ReplyKeyboardBuilder()
     if all_job_data:
-        all_data = [data[0].capitalize() for data in all_job_data]
+        all_data = [data.capitalize() for data in all_job_data]
         for data in all_data:
             keyboard.add(KeyboardButton(text=data))
-        markup = keyboard.adjust(1).as_markup(resize_keyboard=True)
+        markup = keyboard.adjust(1).as_markup(
+            resize_keyboard=True,
+            one_time_keyboard=True,
+        )
         return all_data, markup
     return False
 
@@ -144,12 +162,15 @@ async def check_del_staff():
     all_del_staff_data = await get_all_dell()
     keyboard = ReplyKeyboardBuilder()
     if all_del_staff_data:
-        return False
-    for data in all_del_staff_data:
-        keyboard.add(
-            KeyboardButton(text=f"{data[0].title()} {data[1].title()}")
+        for data in all_del_staff_data:
+            keyboard.add(
+                KeyboardButton(text=f"{data[0].title()} {data[1].title()}")
+            )
+        return keyboard.adjust(1).as_markup(
+            resize_keyboard=True,
+            one_time_keyboard=True,
         )
-    return keyboard.adjust(1).as_markup(resize_keyboard=True)
+    return False
 
 
 async def check_job_del():
@@ -160,10 +181,13 @@ async def check_job_del():
     all_del_staff_data = await get_all_dell_job()
     keyboard = ReplyKeyboardBuilder()
     if all_del_staff_data:
-        return False
-    for data in all_del_staff_data:
-        keyboard.add(KeyboardButton(text=f"{data.capitalize()}"))
-    return keyboard.adjust(1).as_markup(resize_keyboard=True)
+        for data in all_del_staff_data:
+            keyboard.add(KeyboardButton(text=f"{data.capitalize()}"))
+        return keyboard.adjust(1).as_markup(
+            resize_keyboard=True,
+            one_time_keyboard=True,
+        )
+    return False
 
 
 async def check_company_del():
@@ -174,7 +198,10 @@ async def check_company_del():
     all_del_staff_data = await get_all_del_company()
     keyboard = ReplyKeyboardBuilder()
     if all_del_staff_data:
-        return False
-    for data in all_del_staff_data:
-        keyboard.add(KeyboardButton(text=f"{data.capitalize()}"))
-    return keyboard.adjust(1).as_markup(resize_keyboard=True)
+        for data in all_del_staff_data:
+            keyboard.add(KeyboardButton(text=f"{data.capitalize()}"))
+        return keyboard.adjust(1).as_markup(
+            resize_keyboard=True,
+            one_time_keyboard=True,
+        )
+    return False

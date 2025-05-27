@@ -15,6 +15,10 @@ async def address_list(message: Message, state: FSMContext):
     await state.clear()
     company_data = await get_all_company()
     if company_data:
+        await message.reply(
+            "В базе данных находятся следующие компании:",
+            reply_markup=ReplyKeyboardRemove(),
+        )
         for company in company_data:
             await message.reply(
                 text=company.capitalize(), reply_markup=ReplyKeyboardRemove()

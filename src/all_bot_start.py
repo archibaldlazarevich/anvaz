@@ -4,6 +4,14 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.types import BotCommand, BotCommandScopeDefault
 
+from src.adminBot.handlers.custom.add_address import router_add_address
+from src.adminBot.handlers.custom.add_company import router_add_company
+from src.adminBot.handlers.custom.address_list import router_address_list
+from src.adminBot.handlers.custom.company_list import router_company_list
+from src.adminBot.handlers.custom.return_address import router_return_address
+from src.adminBot.handlers.custom.return_company import router_return_company
+from src.adminBot.handlers.custom.rm_address import router_address_rm
+from src.adminBot.handlers.custom.rm_company import router_company_rm
 # adminbot
 from src.adminBot.handlers.default.start import router_start_admin
 from src.adminBot.handlers.default.help import router_help_admin
@@ -153,6 +161,14 @@ async def start_bot_admin():
         router_return_non_staff,
         router_ban_non_empl_list,
         router_return_job,
+        router_add_address,
+        router_add_company,
+        router_company_list,
+        router_address_list,
+        router_return_address,
+        router_return_company,
+        router_address_rm,
+        router_company_rm,
     )
     dp_admin.startup.register(set_commands_admin)
     dp_admin.message.middleware(

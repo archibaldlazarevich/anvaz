@@ -9,7 +9,7 @@ from src.database.func.data_func import (
     get_all_dir_id_for_echo,
     add_new_job,
 )
-from src.database.func.email_func import send_email
+# from src.database.func.email_func import send_email
 import src.employeeBot.keyboards.reply as rep
 
 router_create_task = Router()
@@ -53,18 +53,21 @@ async def cancel_func(message: Message, state: FSMContext):
         job_name=task_data,
         company_name=company_name,
     )
+    await state.clear()
     await message.reply(
         "Заявка успешно добавлена:\n"
         f"Номер заяки: {task_data[0]}\n"
         f"Заказчик: {task_data[1].capitalize()}\n"
-        f"Адрес объекта: {task_data[2].capitalize()}",
+        f"Адрес объекта: {task_data[2].capitalize()}\n"
+        f"Вид работ: {task_data[5].capitalize()}",
         reply_markup=ReplyKeyboardRemove(),
     )
     text = (
         f"Сотрудник {task_data[4].title()} {task_data[3].title()} создал новую заявку:\n"
         f"Номер заявки: {task_data[0]}\n"
         f"Заказчик: {task_data[1].capitalize()}\n"
-        f"Адрес объекта: {task_data[2].capitalize()}"
+        f"Адрес объекта: {task_data[2].capitalize()}\n"
+        f"Вид работ: {task_data[5].capitalize()}"
     )
     dir_all_id = await get_all_dir_id_for_echo()
     for dir_id in dir_all_id:
@@ -72,11 +75,10 @@ async def cancel_func(message: Message, state: FSMContext):
             text=text,
             chat_id=dir_id,
         )
-    await send_email(
-        subject=f"Новая заявка от сотрудника {task_data[4].title()} {task_data[3].title()}",
-        message=text,
-    )
-    await state.clear()
+    # await send_email(
+    #     subject=f"Новая заявка от сотрудника {task_data[4].title()} {task_data[3].title()}",
+    #     message=text,
+    # )
 
 
 @router_create_task.message(Command("create"))
@@ -122,7 +124,7 @@ async def create_address_func(message: Message, state: FSMContext):
 async def create_task(message: Message, state: FSMContext):
     repl_data = await state.get_value("create_address")
     if message.text in repl_data[0]:
-        reply_data = rep.get_all_job_type_reply()
+        reply_data = await rep.get_all_job_type_reply()
         if reply_data:
             await state.update_data(create_address=message.text.lower())
             await state.set_state(CreateTask.create_task)

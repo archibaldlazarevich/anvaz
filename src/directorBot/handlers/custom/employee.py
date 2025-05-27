@@ -36,10 +36,9 @@ async def dir_emp_init(message: Message, state: FSMContext):
 
 
 @router_dir_emp.message(DirEmpState.init)
-async def dir_emp_init(message: Message, state: FSMContext):
+async def dir_emp_cancel(message: Message, state: FSMContext):
     empl_data = await state.get_value("init")
     if message.text in empl_data[0]:
-        await state.clear()
         name, surname = message.text.split()
         job_data = await get_job_by_empl(
             name=name.lower(), surname=surname.lower()
@@ -61,6 +60,7 @@ async def dir_emp_init(message: Message, state: FSMContext):
                 f"В данный момент у {name} {surname} нет действующий заявок.",
                 reply_markup=ReplyKeyboardRemove(),
             )
+        await state.clear()
     else:
         await message.reply(
             "Выберите данные из списка!!!", reply_markup=ReplyKeyboardRemove()

@@ -17,7 +17,6 @@ router_add_address = Router()
 
 class AddAddress(StatesGroup):
     init = State()
-    reply: State = State()
     create_address = State()
 
 

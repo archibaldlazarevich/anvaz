@@ -93,5 +93,5 @@ async def rm_address_cancel(message: Message, state: FSMContext):
         )
     else:
         await rm_address(company_name=company_name, address=address)
-        await message.reply("Адрес переведен в список неактивных")
+        await message.reply("Адрес переведен в список неактивных", reply_markup=ReplyKeyboardRemove())
         await state.clear()
