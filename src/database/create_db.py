@@ -87,22 +87,22 @@ async def create_db() -> None:
         )
         for i in range(1, 4)
     ]
-    directors.append(
-        Staff(
-            tel_id=434988753,
-            status=3,
-            name=fake.first_name().lower(),
-            surname=fake.last_name().lower(),
-        )
-    )
-    employees.append(
-        Staff(
-            tel_id=434988753,
-            status=2,
-            name=fake.first_name().lower(),
-            surname=fake.last_name().lower(),
-        )
-    )
+    # directors.append(
+    #     Staff(
+    #         tel_id=434988753,
+    #         status=3,
+    #         name=fake.first_name().lower(),
+    #         surname=fake.last_name().lower(),
+    #     )
+    # )
+    # employees.append(
+    #     Staff(
+    #         tel_id=434988753,
+    #         status=2,
+    #         name=fake.first_name().lower(),
+    #         surname=fake.last_name().lower(),
+    #     )
+    # )
     company = [
         Company(
             company_name=fake.company().lower(),
@@ -125,7 +125,7 @@ async def create_db() -> None:
         session.add(admin)
         session.add_all(users)
         session.add_all(employees)
-        session.add_all(directors)
+        # session.add_all(directors)
         session.add_all(jobs_type)
         session.add_all(jobs)
         session.add_all(company)

@@ -46,7 +46,7 @@ async def check_company_command(message: Message, state: FSMContext):
     if check_company_data == 3:
         await message.reply(
             "Данная компания уже добавлена в базу данных, "
-            "чтобы сделать ее активной, воспользуйтесь командой \n/return_company",
+            "чтобы сделать ее активной, воспользуйтесь командой:\n/return_company",
             reply_markup=ReplyKeyboardRemove(),
         )
         await state.clear()

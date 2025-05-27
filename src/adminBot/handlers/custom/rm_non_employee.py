@@ -30,7 +30,7 @@ async def add_dir_init(message: Message, state: FSMContext):
         await send_non_staff(message=message, state=state)
     else:
         await message.reply(
-            "В базе данных нет свободных пользователей",
+            "В базе данных нет свободных пользователей.",
             reply_markup=ReplyKeyboardRemove(),
         )
 
@@ -43,7 +43,7 @@ async def add_dir_choice(message: Message, state: FSMContext):
         name, surname = message.text.split()
         await rm_non_staff(name=name.lower(), surname=surname.lower())
         await message.reply(
-            f"Пользователь {name} {surname} переведен в неактивные",
+            f"Пользователь {name} {surname} переведен в неактивные.",
             reply_markup=ReplyKeyboardRemove(),
         )
     else:

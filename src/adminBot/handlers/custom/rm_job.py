@@ -30,7 +30,7 @@ async def add_dir_init(message: Message, state: FSMContext):
         await send_job(message=message, state=state)
     else:
         await message.reply(
-            "В базе данных нет ни одного добавленного вида работ",
+            "В базе данных нет ни одного добавленного вида работ.",
             reply_markup=ReplyKeyboardRemove(),
         )
 
@@ -43,7 +43,7 @@ async def add_dir_choice(message: Message, state: FSMContext):
         await rm_job(job_name=message.text.lower())
         await message.reply(
             f'Вид работ: "{message.text.capitalize()}" удален из базы данных, '
-            f"старые заявки с удаленным видом работ всё ещё доступны",
+            f"старые заявки с удаленным видом работ всё ещё доступны.",
             reply_markup=ReplyKeyboardRemove(),
         )
     else:

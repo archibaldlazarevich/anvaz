@@ -30,7 +30,7 @@ async def dir_emp_init(message: Message, state: FSMContext):
         await send_empl(message=message, state=state)
     else:
         await message.reply(
-            "В данный момент все работники свободны",
+            "В данный момент все работники свободны.",
             reply_markup=ReplyKeyboardRemove(),
         )
 

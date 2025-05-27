@@ -21,6 +21,6 @@ async def add_dir_init(message: Message, state: FSMContext):
             await message.answer(f"{job.capitalize()}")
     else:
         await message.reply(
-            "В базе данных нет добавленных видов работ",
+            "В базе данных нет добавленных видов работ.",
             reply_markup=ReplyKeyboardRemove(),
         )

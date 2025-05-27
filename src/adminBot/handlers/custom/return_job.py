@@ -37,7 +37,7 @@ async def add_dir_choice(message: Message, state: FSMContext):
     await state.clear()
     if await return_del_job(job_name=message.text.lower()):
         await message.reply(
-            f"Вид работы {message.text.capitalize()} переведен в активные",
+            f"Вид работы {message.text.capitalize()} переведен в активные.",
             reply_markup=ReplyKeyboardRemove(),
         )
     else:

@@ -21,6 +21,6 @@ async def add_dir_init(message: Message, state: FSMContext):
             await message.answer(f"{dir_[0].title()} {dir_[1].title()}")
     else:
         await message.reply(
-            "В базе данных нет действующий начальников",
+            "В базе данных нет действующий начальников.",
             reply_markup=ReplyKeyboardRemove(),
         )

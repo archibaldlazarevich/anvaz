@@ -24,6 +24,6 @@ async def busy_init(message: Message, state: FSMContext):
             )
     else:
         await message.reply(
-            "В данный момент все работники свободны",
+            "В данный момент все работники свободны.",
             reply_markup=ReplyKeyboardRemove(),
         )

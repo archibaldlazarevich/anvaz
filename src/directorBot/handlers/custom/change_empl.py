@@ -11,7 +11,6 @@ from src.database.func.data_func import (
     get_tel_id,
 )
 import src.directorBot.keyboards.reply as rep
-# from src.database.func.email_func import send_email
 
 router_change = Router()
 
@@ -57,7 +56,7 @@ async def change_empl_init(message: Message, state: FSMContext):
         await send_empl(message=message, state=state)
     else:
         await message.reply(
-            "В данный момент все работники свободны",
+            "В данный момент все работники свободны.",
             reply_markup=ReplyKeyboardRemove(),
         )
 
@@ -82,7 +81,7 @@ async def change_job_init(message: Message, state: FSMContext):
                 await message.reply("Работник закрыл действующую заявку.")
         else:
             await message.reply(
-                "В данный момент нет других работников в базе данных",
+                "В данный момент нет других работников в базе данных.",
                 reply_markup=ReplyKeyboardRemove(),
             )
     else:
@@ -119,7 +118,7 @@ async def cancel_update(message: Message, state: FSMContext):
     empl_data = await state.get_value("change_empl")
     if message.text in empl_data[0]:
         name_old, surname_old = await state.get_value("init")
-        empl_id = await get_tel_id(name= name_old, surname= surname_old)
+        empl_id = await get_tel_id(name=name_old, surname=surname_old)
         name, surname = message.text.split()
         task_id = await state.get_value("update")
         new_task_data = await set_new_empl_for_job(
@@ -148,14 +147,7 @@ async def cancel_update(message: Message, state: FSMContext):
             text=text,
             chat_id=new_task_data[4],
         )
-        await bot.send_message(
-            text= text_old, chat_id=empl_id
-        )
-        # await send_email(
-        #     subject=f"Сотрудник {new_task_data[5].capitalize()} {new_task_data[6].capitalize()}"
-        #     f" переназначен ответсвенным за заявку № {new_task_data[0]}",
-        #     message=text,
-        # )
+        await bot.send_message(text=text_old, chat_id=empl_id)
     else:
         await message.reply(
             "Выберите данные из списка!!!", reply_markup=ReplyKeyboardRemove()

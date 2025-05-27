@@ -66,8 +66,9 @@ async def get_job_by_empl_name(name: str, surname: str):
         keyboard = ReplyKeyboardBuilder()
         all_data = [
             f"Заявка № {data[0]}\n"
-            f"Организация: {data[1].capitalize()}\n"
-            f"Адреc: {data[2].capitalize()}"
+            f"Вид работ {data[1].capitalize()}\n"
+            f"Заказчик: {data[2].capitalize()}\n"
+            f"Адрес: {data[3].capitalize()}"
             for data in job_data
         ]
         for data in all_data:
@@ -104,30 +105,6 @@ async def key_busy_employee_without_spec(name: str, surname: str):
         )
         return all_data, markup
     return False
-
-
-# async def check_task(empl_id: int):
-#     """
-#     Функция, которая возвращает клавиатуру, если есть незакрытые заявки у работника
-#     :param empl_id:
-#     :return:
-#     """
-#     all_jobs = await get_all_job_by_empl(empl_id=empl_id)
-#     if all_jobs:
-#         keyboard = ReplyKeyboardBuilder()
-#         for data in all_jobs:
-#             keyboard.add(
-#                 KeyboardButton(
-#                     text=f"Заявка № {data[0]}\n"
-#                     f"Организация {data[1]}\n"
-#                     f"Адрес {data[2]}"
-#                 )
-#             )
-#         return keyboard.adjust(1).as_markup(
-#             resize_keyboard=True,
-#             one_time_keyboard=True,
-#         )
-#     return False
 
 
 employee = ReplyKeyboardMarkup(

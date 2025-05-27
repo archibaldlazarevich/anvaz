@@ -22,7 +22,7 @@ async def add_dir_init(message: Message, state: FSMContext):
     if repl_data:
         await state.set_state(RetNonStaff.init)
         await message.reply(
-            "Для возврата в статус пользователя, выберите аккаунт из списка",
+            "Для возврата в статус пользователя, выберите аккаунт из списка:",
             reply_markup=await rep.check_del_staff(),
         )
     else:
@@ -37,7 +37,7 @@ async def add_dir_choice(message: Message, state: FSMContext):
     name, surname = message.text.split()
     if await return_del(name=name.lower(), surname=surname.lower()):
         await message.reply(
-            f"Пользователь {name} {surname} переведен в неактивные",
+            f"Пользователь {name} {surname} переведен в неактивные.",
             reply_markup=ReplyKeyboardRemove(),
         )
     else:

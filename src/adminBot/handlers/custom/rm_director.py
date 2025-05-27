@@ -31,7 +31,7 @@ async def add_dir_init(message: Message, state: FSMContext):
         await send_dir(message=message, state=state)
     else:
         await message.reply(
-            "Нет начальников в базе данных",
+            "Нет начальников в базе данных.",
             reply_markup=ReplyKeyboardRemove(),
         )
 
@@ -44,7 +44,7 @@ async def add_dir_choice(message: Message, state: FSMContext):
         name, surname = message.text.split()
         await rm_direct(name=name.lower(), surname=surname.lower())
         await message.reply(
-            f"Начальник {name} {surname} переведен в разряд пользователей",
+            f"Начальник {name} {surname} переведен в разряд пользователей.",
             reply_markup=ReplyKeyboardRemove(),
         )
     else:

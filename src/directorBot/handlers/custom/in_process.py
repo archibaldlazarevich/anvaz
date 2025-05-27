@@ -24,6 +24,6 @@ async def proc_init(message: Message, state: FSMContext):
             )
     else:
         await message.reply(
-            "В данный момент нет действующих заявок",
+            "В данный момент нет действующих заявок.",
             reply_markup=ReplyKeyboardRemove(),
         )

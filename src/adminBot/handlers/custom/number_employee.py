@@ -13,6 +13,6 @@ async def add_dir_init(message: Message, state: FSMContext):
     await state.clear()
     employees = await get_all_emp()
     await message.reply(
-        f"В базе данных всего {len(employees)} рабочих",
+        f"В базе данных всего {len(employees)} рабочих.",
         reply_markup=ReplyKeyboardRemove(),
     )
