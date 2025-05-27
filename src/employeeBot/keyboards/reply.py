@@ -6,7 +6,8 @@ from src.database.func.data_func import (
     get_all_company_name,
     get_all_job_by_empl,
     get_address_by_empl_id_for_update,
-    get_all_company_name_without_spec, get_all_active_company_name,
+    get_all_company_name_without_spec,
+    get_all_active_company_name,
 )
 
 

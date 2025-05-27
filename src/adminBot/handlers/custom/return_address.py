@@ -62,7 +62,7 @@ async def return_company_choice(message: Message, state: FSMContext):
     if check_company_data == 3:
         await message.reply(
             "Данная компания уже добавлена в базу данных, "
-            "чтобы сделать ее активной, воспользуйтесь командой \n/return_company",
+            "чтобы сделать ее активной, воспользуйтесь командой: \n/return_company",
             reply_markup=ReplyKeyboardRemove(),
         )
         await state.clear()
@@ -96,6 +96,6 @@ async def rm_address_cancel(message: Message, state: FSMContext):
     else:
         await return_address(company_name=company_name, address=address)
         await message.reply(
-            "Адрес переведен в активные", reply_markup=ReplyKeyboardRemove()
+            "Адрес переведен в активные.", reply_markup=ReplyKeyboardRemove()
         )
         await state.clear()

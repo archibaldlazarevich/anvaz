@@ -14,8 +14,8 @@ async def cmd_start(message: Message, state: FSMContext) -> None:
     commands = "\n".join(
         [f"/{command[0]} - {command[1]}" for command in DEFAULT_ADMIN_COMMANDS]
     )
-    await message.reply(
-        "Бот для админа контроля работы сотрудников анваза.\n"
+    await message.answer(
+        "Бот для админа.\n"
         "Команды, которые выполняет данный бот:\n"
         f"{commands}",
         reply_markup=ReplyKeyboardRemove(),

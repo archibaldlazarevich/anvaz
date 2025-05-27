@@ -13,7 +13,41 @@ from src.database.models import (
     Address,
 )
 
-from sqlalchemy import select, update, and_, insert, delete
+from sqlalchemy import select, update, and_, insert
+
+
+async def get_empl_if_exist(empl_id: int):
+    """
+    Функция проверяет есть ли пользователь в базе данных
+    :param empl_id:
+    :return:
+    """
+    async with get_db_session() as session:
+        result_data = await session.execute(
+            select(Staff).where(
+                (Staff.tel_id == empl_id),
+            )
+        )
+        result = result_data.scalar_one_or_none()
+    return True if not result else False
+
+
+async def insert_new_staff(name: str, surname: str, empl_id: int):
+    """
+    Функция добавляет нового пользователя
+    :param name:
+    :param surname:
+    :param empl_id:
+    :return:
+    """
+
+    async with get_db_session() as session:
+        await session.execute(
+            insert(Staff).values(
+                status=1, name=name, surname=surname, tel_id=empl_id
+            )
+        )
+        await session.commit()
 
 
 async def add_direct(name: str, surname: str) -> int:
@@ -258,6 +292,7 @@ async def rm_employee(name: str, surname: str) -> bool:
         employee = empl_data.scalar_one_or_none()
     return employee == 1
 
+
 async def get_tel_id(name: str, surname: str):
     """
     Функция возвращает id телеграмма сотрудника по его имени и фамилии
@@ -266,9 +301,14 @@ async def get_tel_id(name: str, surname: str):
     :return:
     """
     async with get_db_session() as session:
-        tel_id_data = await session.execute(select(Staff).where(and_(Staff.name == name, Staff.surname == surname)))
+        tel_id_data = await session.execute(
+            select(Staff).where(
+                and_(Staff.name == name, Staff.surname == surname)
+            )
+        )
         tel_id = tel_id_data.scalar_one_or_none()
     return tel_id
+
 
 async def rm_job(job_name: str) -> None:
     """
@@ -672,24 +712,6 @@ async def get_all_job_type() -> list:
     return [job_type.job_name for job_type in job_type_data.scalars().all()]
 
 
-# async def insert_job_type(job_type: str, empl_id: int):
-#     """
-#     Добавляет в базу данных завку и тип работы
-#     :return:
-#     """
-#     asdasd
-#     job_id = await get_last_task_by_empl(empl_id=empl_id)
-#     async with get_db_session() as session:
-#         job_type_data = await session.execute(
-#             select(JobType).where(JobType.job_name == job_type)
-#         )
-#         job_type_id = job_type_data.scalar_one_or_none().id
-#         await session.execute(
-#             update(Jobs).where(Jobs.id == job_id).values(job_id=job_type_id)
-#         )
-#         await session.commit()
-
-
 async def get_all_company_name():
     """
     Функция, возвращающая список названий компаний, которые есть в бд
@@ -699,7 +721,10 @@ async def get_all_company_name():
         company_name_data = await session.execute(
             select(Company).where(Company.status == 1)
         )
-    return [company_name.company_name for company_name in company_name_data.scalars().all()]
+    return [
+        company_name.company_name
+        for company_name in company_name_data.scalars().all()
+    ]
 
 
 async def get_all_active_company_name():
@@ -709,129 +734,15 @@ async def get_all_active_company_name():
     """
     async with get_db_session() as session:
         company_name_data = await session.execute(
-            select(Address).join(Address.company).options(joinedload(Address.company)).where(and_(Company.status == 1, Address.status == 1))
+            select(Address)
+            .join(Address.company)
+            .options(joinedload(Address.company))
+            .where(and_(Company.status == 1, Address.status == 1))
         )
-    return [company_name.company.company_name for company_name in company_name_data.scalars().all()]
-
-# async def insert_organization(empl_id: int, company_name: str):
-#     """
-#     Функция, дабавляющая в базу даных, обслуживаемаю организацию
-#     :return:
-#     """
-#     asd
-#     job_id = await get_last_task_by_empl(empl_id=empl_id)
-#     async with get_db_session() as session:
-#         company_data = await session.execute(
-#             select(Company).where(Company.company_name == company_name)
-#         )
-#         company = company_data.scalar_one_or_none()
-#         if company is None:
-#             await session.execute(
-#                 insert(Company).values(company_name=company_name)
-#             )
-#             new_company_data = await session.execute(
-#                 select(Company).where(Company.company_name == company_name)
-#             )
-#             company = new_company_data.scalar_one_or_none()
-#         await session.execute(
-#             update(Jobs).where(Jobs.id == job_id).values(company_id=company.id)
-#         )
-#         await session.commit()
-
-
-# async def create_new_task(empl_id: int):
-#     """
-#     Функция, создающая новую задачу работника
-#     :param empl_id: id работника
-#     :return:
-#     """
-# asd
-#     async with get_db_session() as session:
-#         empl_data = await session.execute(
-#             select(Staff.id).where(
-#                 and_(
-#                     Staff.tel_id == empl_id,
-#                     Staff.status == 2,  #### удалить Правка
-#                 )
-#             )
-#         )
-#         await session.execute(
-#             insert(Jobs).values(employee=empl_data.scalar_one_or_none())
-#         )
-#         await session.commit()
-
-
-# async def get_last_task_by_empl(empl_id: int) -> int:
-#     """
-#     Функция, возвращающая id последней добавленной работником задачи
-#     :param empl_id: id работника
-#     :return:
-#     """
-#
-#     async with get_db_session() as session:
-#         empl_id_data = await session.execute(
-#             select(Staff.id).where(
-#                 and_(Staff.tel_id == empl_id, Staff.status == 2)  ### Правка
-#             )
-#         )
-#         task_data = await session.execute(
-#             select(Jobs.id)
-#             .where(Jobs.employee == empl_id_data.scalar_one_or_none())
-#             .order_by(desc(Jobs.id))
-#             .limit(1)
-#         )
-#         task_id = task_data.scalar_one_or_none()
-#     return task_id
-
-
-# async def get_address_by_empl_id(empl_id: int) -> bool | list:
-#     """
-#     Функция, возращающая либо список аддресов объектов компании, либо None при их отсутствии
-#     :param empl_id:
-#     :return:
-#     """
-#     jobs_data = await get_last_company_by_empl(empl_id=empl_id)
-#     async with get_db_session() as session:
-#         addresses_data = await session.execute(
-#             select(Address.address).where(
-#                 and_(
-#                     Address.company_id == jobs_data.company.id,
-#                     Address.status == 1,
-#                 )
-#             )
-#         )
-#         addresses = addresses_data.scalars().all()
-#     if len(addresses) != 0:
-#         return addresses
-#     return False
-
-
-# async def get_last_company_by_empl(empl_id: int):
-#     """
-#     Функция, возращающая последнюю работу из последней зарег задачи
-#     :param empl_id:
-#     :return:
-#     """
-#
-#     async with get_db_session() as session:
-#         company_id_data = await session.execute(
-#             select(Jobs)
-#             .join(Jobs.staff)
-#             .join(Jobs.company)
-#             .options(joinedload(Jobs.staff), joinedload(Jobs.company))
-#             .where(
-#                 and_(
-#                     Staff.tel_id == empl_id,
-#                     Staff.status == 2,
-#                 )
-#             )
-#             .order_by(desc(Jobs.id))
-#             .limit(1)
-#         )
-#         jobs_data = company_id_data.scalars().one_or_none()
-#     if isinstance(jobs_data.company_id, int):
-#         return jobs_data
-#     return False
+    return [
+        company_name.company.company_name
+        for company_name in company_name_data.scalars().all()
+    ]
 
 
 async def add_new_address(company_name: str, address: str):
@@ -980,22 +891,6 @@ async def check_address_for_company(address: str, company_name: str):
         )
         address = address_data.scalar_one_or_none()
     return address is not None
-
-#
-# async def check_address_def(address: str):
-#     """
-#     Функция по проверке о наличии адреса
-#     :param address:
-#     :return:
-#     """
-#     async with get_db_session() as session:
-#         address_data = await session.execute(
-#             select(Address).where(Address.address == address)
-#         )
-#         address = address_data.scalar_one_or_none()
-#     if address is not None:
-#         return address
-#     return False
 
 
 async def get_address_company_id(address: str, company_name: str):
@@ -1182,59 +1077,6 @@ async def close_task_by_empl(task_id: int) -> list:
     ]
 
 
-# async def get_company_name(job_id: int) -> str:
-#     """
-#     Функция возвращает название компании, по id заявки
-#     :param job_id:
-#     :return:
-#     """
-#     async with get_db_session() as session:
-#         result = await session.execute(
-#             select(Company.company_name)
-#             .join(Company.jobs)
-#             .where(Jobs.id == job_id)
-#         )
-#         company_name = result.scalar_one_or_none()
-#     return company_name
-
-
-# async def insert_new_job_change(job_id: int):
-#     """
-#     Фунция, которая создает новую запись в модели job_change
-#     :param job_id:
-#     :return:
-#     """
-#     asdasdaas
-#     async with get_db_session() as session:
-#         job_data = await session.execute(
-#             select(Jobs)
-#             .join(Jobs.company)
-#             .join(Jobs.type)
-#             .join(Jobs.address)
-#             .options(
-#                 joinedload(Jobs.company),
-#                 joinedload(Jobs.type),
-#                 joinedload(Jobs.address),
-#             )
-#             .where(Jobs.id == job_id)
-#         )
-#         job = job_data.scalars().first()
-#         await session.execute(
-#             insert(ChangeJobs).values(
-#                 employee_id=job.employee,
-#                 jobs_id=job_id,
-#                 job_id_old=job.type.id,
-#                 job_id_new=job.type.id,
-#                 company_old_id=job.company.id,
-#                 company_new_id=job.company.id,
-#                 address_old_id=job.address.id,
-#                 address_new_id=job.address.id,
-#                 time_init=job.time_add,
-#             )
-#         )
-#         await session.commit()
-
-
 async def get_all_address_for_company(company_name: str):
     """
     Возвращает список адресов по компании
@@ -1371,55 +1213,6 @@ async def check_ban_address_for_company(company_name: str):
     )
 
 
-# async def check_company(company_name: str):
-#     """
-#     Функция, проверяет наличие компании по названию
-#     :param company_name:
-#     :return:
-#     """
-#     async with get_db_session() as session:
-#         company_data = await session.execute(
-#             select(Company).where(
-#                 and_(Company.company_name == company_name, Company.status == 1)
-#             )
-#         )
-#         company = company_data.scalar_one_or_none()
-#     return company if company is not None else None
-
-
-# async def update_company_for_task(company_id: int, task_id: int):
-#     """
-#     Функция, меняет занчение id компании в заявке
-#     :param task_id:
-#     :param company_id:
-#     :return:
-#     """
-#     async with get_db_session() as session:
-#         await session.execute(
-#             update(Jobs)
-#             .where(Jobs.id == task_id)
-#             .values(company_id=company_id)
-#         )
-#         change_data = await session.execute(
-#             select(ChangeJobs)
-#             .where(ChangeJobs.jobs_id == task_id)
-#             .order_by(desc(ChangeJobs.id))
-#             .limit(1)
-#         )
-#         change = change_data.scalar_one_or_none()
-#         await session.execute(
-#             update(ChangeJobs)
-#             .where(ChangeJobs.id == change.id)
-#             .values(company_new_id=company_id)
-#         )
-#         await session.execute(
-#             update(Company)
-#             .where(Company.id == company_id)
-#             .values(tasks=Company.tasks + 1)
-#         )
-#         await session.commit()
-
-
 async def check_job(job_name: str):
     """
     Функция проверяет есть такой вид работ в базе данных
@@ -1447,53 +1240,6 @@ async def change_task_by_company(company_name: str):
             .values(tasks=Company.tasks - 1)
         )
         await session.commit()
-
-
-# async def update_company_name(empl_id: int, new_name: str):
-#     """
-#     Функция, которая добавляет название компании в запись о замене данных
-#     :param new_name:
-#     :param empl_id:
-#     :return:
-#     """
-#     async with get_db_session() as session:
-#         job_data = await session.execute(
-#             select(ChangeJobs)
-#             .join(ChangeJobs.staff)
-#             .options(joinedload(ChangeJobs.staff))
-#             .where(Staff.tel_id == empl_id)
-#             .order_by(desc(ChangeJobs.id))
-#             .limit(1)
-#         )
-#         job = job_data.scalars().first()
-#         await session.execute(insert(Company).values(company_name=new_name))
-#         new_company_data = await session.execute(
-#             select(Company).where(Company.company_name == new_name)
-#         )
-#         new_company_id = new_company_data.scalar_one().id
-#         await session.execute(
-#             update(ChangeJobs)
-#             .where(ChangeJobs.id == job.id)
-#             .values(company_new_id=new_company_id)
-#         )
-#         change_jobs_data = await session.execute(
-#             select(ChangeJobs)
-#             .where(
-#                 and_(
-#                     ChangeJobs.id == job.id,
-#                     ChangeJobs.company_new_id == new_company_id,
-#                 )
-#             )
-#             .order_by(desc(ChangeJobs.id))
-#             .limit(1)
-#         )
-#         change_job = change_jobs_data.scalar()
-#         await session.execute(
-#             update(Jobs)
-#             .where(Jobs.id == change_job.jobs_id)
-#             .values(company_id=new_company_id)
-#         )
-#         await session.commit()
 
 
 async def get_task_all_data(task_id: int):
@@ -1534,36 +1280,6 @@ async def get_task_all_data(task_id: int):
         }
 
 
-# async def get_address_name_update(empl_id: int) -> str:
-#     """
-#     Функция,которая возвращает значение адреса по последней изменяемой задаче
-#     :return:
-#     """
-#     company_address = aliased(Address)
-#
-#     async with get_db_session() as session:
-#         address_data = await session.execute(
-#             select(
-#                 ChangeJobs, company_address.address.label("company_address")
-#             )
-#             .join(ChangeJobs.staff)
-#             .join(
-#                 company_address,
-#                 ChangeJobs.address_new_id == company_address.id,
-#             )
-#             .options(
-#                 joinedload(ChangeJobs.staff),
-#                 joinedload(ChangeJobs.address_new),
-#             )
-#             .where(Staff.tel_id == empl_id)
-#             .order_by(desc(ChangeJobs.id))
-#             .limit(1)
-#         )
-#         address_data = address_data.first()
-#         (change_job, address) = address_data
-#     return address
-
-
 async def get_address_by_empl_id_for_update(company_name: str) -> list | bool:
     """
     Функиця, возвращает список адресов компании или false при их отсутствии
@@ -1587,217 +1303,6 @@ async def get_address_by_empl_id_for_update(company_name: str) -> list | bool:
             if address_data
             else False
         )
-
-
-# async def update_address_for_company(
-#     new_address: str, empl_id: int, new_company=False
-# ):
-#     """
-#     Функция, которая обновляет адрес в модели компании и изменении работы
-#     :param new_company:
-#     :param new_address:
-#     :param empl_id:
-#     :return:
-#     """
-#     async with get_db_session() as session:
-#         company_data = await session.execute(
-#             select(ChangeJobs)
-#             .join(ChangeJobs.staff)
-#             .options(joinedload(ChangeJobs.staff))
-#             .where(Staff.tel_id == empl_id)
-#             .order_by(desc(ChangeJobs.id))
-#             .limit(1)
-#         )
-#         row = company_data.scalars().first()
-#         if new_company:
-#             await session.execute(
-#                 insert(Address).values(
-#                     company_id=row.company_new_id, address=new_address
-#                 )
-#             )
-#             new_address_data = await session.execute(
-#                 select(Address).where(
-#                     and_(
-#                         Address.company_id == row.company_new_id,
-#                         Address.address == new_address,
-#                     )
-#                 )
-#             )
-#             new_address = new_address_data.scalar()
-#         else:
-#             new_address_data = await session.execute(
-#                 select(Address).where(Address.address == new_address)
-#             )
-#             new_address = new_address_data.scalar()
-#         await session.execute(
-#             update(Jobs)
-#             .where(Jobs.id == row.jobs_id)
-#             .values(address_id=new_address.id)
-#         )
-#         await session.execute(
-#             update(ChangeJobs)
-#             .where(ChangeJobs.id == row.id)
-#             .values(address_new_id=new_address.id)
-#         )
-#         await session.commit()
-
-#
-# async def get_job_type_update(empl_id: int) -> str:
-#     """
-#     Функция, которая возвращает тип работы по данной заявке
-#     :param empl_id:
-#     :return:
-#     """
-#     async with get_db_session() as session:
-#         job_type_data = await session.execute(
-#             select(
-#                 ChangeJobs,
-#             )
-#             .join(ChangeJobs.staff)
-#             .join(ChangeJobs.job_new)
-#             .options(
-#                 joinedload(ChangeJobs.staff), joinedload(ChangeJobs.job_new)
-#             )
-#             .where(Staff.tel_id == empl_id)
-#             .order_by(desc(ChangeJobs.id))
-#             .limit(1)
-#         )
-#         job_type = job_type_data.scalars().first()
-#     return job_type.job_new.job_name
-
-#
-# async def set_time_change(empl_id: int):
-#     """
-#     Функция, которая добавляет знаачени завершенного времени ыормирования функции
-#     :param empl_id:
-#     :return:
-#     """
-#
-#     async with get_db_session() as session:
-#         change_jobs_data = await session.execute(
-#             select(ChangeJobs)
-#             .options(joinedload(ChangeJobs.staff))
-#             .where(and_(Staff.tel_id == empl_id, Staff.status == 2))
-#             .order_by(desc(ChangeJobs.id))
-#             .limit(1)
-#         )
-#         change_jobs = change_jobs_data.scalars().first()
-#         await session.execute(
-#             update(ChangeJobs)
-#             .where(ChangeJobs.id == change_jobs.id)
-#             .values(time_change=datetime.datetime.today())
-#         )
-#         await session.commit()
-
-
-# async def update_job_type(empl_id: int, job_type: str):
-#     """
-#     Функция, которая обновляет вид работ, записанный в базе данных
-#     :param job_type:
-#     :param empl_id:
-#     :return:
-#     """
-#
-#     async with get_db_session() as session:
-#         job_type_id_data = await session.execute(
-#             select(JobType.id).where(JobType.job_name == job_type)
-#         )
-#         job_type_id = job_type_id_data.scalar()
-#         change_jobs_data = await session.execute(
-#             select(ChangeJobs)
-#             .join(ChangeJobs.staff)
-#             .options(joinedload(ChangeJobs.staff))
-#             .where(and_(Staff.tel_id == empl_id, Staff.status == 2))
-#             .order_by(desc(ChangeJobs.id))
-#             .limit(1)
-#         )
-#         change_jobs = change_jobs_data.scalars().first()
-#         await session.execute(
-#             update(ChangeJobs)
-#             .where(ChangeJobs.id == change_jobs.id)
-#             .values(
-#                 job_id_new=job_type_id, time_change=datetime.datetime.today()
-#             )
-#         )
-#         await session.execute(
-#             update(Jobs)
-#             .where(Jobs.id == change_jobs.jobs_id)
-#             .values(job_id=job_type_id)
-#         )
-#         await session.commit()
-
-
-# async def get_new_job(empl_id: int) -> list:
-#     """
-#     Функция, которая возращает последнюю измененную заявку
-#     :param empl_id:
-#     :return:
-#     """
-#     company_old = aliased(Company)
-#     company_new = aliased(Company)
-#     job_name_old = aliased(JobType)
-#     job_name_new = aliased(JobType)
-#     address_old = aliased(Address)
-#     address_new = aliased(Address)
-#
-#     async with get_db_session() as session:
-#         jobs_data = await session.execute(
-#             select(
-#                 ChangeJobs,
-#                 company_old.company_name.label("old_name"),
-#                 company_new.company_name.label("new_name"),
-#                 job_name_old.job_name.label("job_name_old"),
-#                 job_name_new.job_name.label("job_name_new"),
-#                 address_old.address.label("address_old"),
-#                 address_new.address.label("address_new"),
-#             )
-#             .join(ChangeJobs.staff)
-#             .join(ChangeJobs.jobs)
-#             .join(ChangeJobs.job_new)
-#             .join(company_old, ChangeJobs.company_old_id == company_old.id)
-#             .outerjoin(
-#                 company_new, ChangeJobs.company_new_id == company_new.id
-#             )
-#             .join(job_name_old, ChangeJobs.job_id_old == job_name_old.id)
-#             .outerjoin(job_name_new, ChangeJobs.job_id_new == job_name_new.id)
-#             .join(address_old, ChangeJobs.address_old_id == address_old.id)
-#             .outerjoin(
-#                 address_new, ChangeJobs.address_new_id == address_new.id
-#             )
-#             .options(
-#                 joinedload(ChangeJobs.staff),
-#                 joinedload(ChangeJobs.jobs),
-#                 joinedload(ChangeJobs.job_new),
-#             )
-#             .where(and_(Staff.tel_id == empl_id, Staff.status == 2))
-#             .order_by(desc(ChangeJobs.id))
-#             .limit(1)
-#         )
-#         row = jobs_data.first()
-#     (
-#         change_job,
-#         old_name,
-#         new_name,
-#         job_name_old,
-#         job_name_new,
-#         address_old,
-#         address_new,
-#     ) = row
-#     return [
-#         change_job.jobs.id,
-#         [job_name_old, job_name_new],
-#         [old_name, new_name],
-#         [address_old, address_new],
-#         [
-#             datetime.datetime.strftime(
-#                 change_job.time_init, "%H:%M %d.%m.%Y г."
-#             ),
-#             datetime.datetime.strftime(
-#                 change_job.time_change, "%H:%M %d.%m.%Y г."
-#             ),
-#         ],
-#         [change_job.staff.name, change_job.staff.surname],
-#     ]
 
 
 async def change_task_count_company(old_id: int, new_id: int):

@@ -71,11 +71,11 @@ async def add_dir_choice(message: Message, state: FSMContext):
     elif check_address == 3:
         await message.reply(
             "Данный адрес неактивен для данной компании, пожалуйста, "
-            "измените стату адреса на активный командой:\n/return_address",
+            "измените статус адреса на активный командой:\n/return_address",
             reply_markup=ReplyKeyboardRemove(),
         )
     else:
         await message.reply(
-            f"Данный адрес для данной компании {company_name}, уже существует!!!"
+            f"Данный адрес для данной компании {company_name}, уже существует."
         )
     await state.clear()

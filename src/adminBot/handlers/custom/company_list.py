@@ -25,5 +25,6 @@ async def address_list(message: Message, state: FSMContext):
             )
     else:
         await message.reply(
-            "Список активных компаний пуст", reply_markup=ReplyKeyboardRemove()
+            "Список активных компаний пуст.",
+            reply_markup=ReplyKeyboardRemove(),
         )

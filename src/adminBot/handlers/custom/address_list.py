@@ -56,9 +56,14 @@ async def check_company_command(message: Message, state: FSMContext):
                 reply_markup=ReplyKeyboardRemove(),
             )
             for address in address_company:
-                await message.answer(text=address.capitalize(), reply_markup=ReplyKeyboardRemove(),)
+                await message.answer(
+                    text=address.capitalize(),
+                    reply_markup=ReplyKeyboardRemove(),
+                )
         else:
-            await message.reply('У этой компании в данный момент нет активных адресов')
+            await message.reply(
+                "У этой компании в данный момент нет активных адресов"
+            )
         await state.clear()
     else:
         await message.reply(

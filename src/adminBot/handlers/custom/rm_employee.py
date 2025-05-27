@@ -43,7 +43,7 @@ async def add_dir_choice(message: Message, state: FSMContext):
         name, surname = message.text.split()
         await rm_employee(name=name.lower(), surname=surname.lower())
         await message.reply(
-            f"Работник {name} {surname} переведен в разряд пользователей",
+            f"Работник {name} {surname} переведен в разряд пользователей.",
             reply_markup=ReplyKeyboardRemove(),
         )
     else:

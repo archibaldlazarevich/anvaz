@@ -22,16 +22,16 @@ from typing import Callable, Dict, Any, Awaitable
 #         else:
 #             await handler(event, data)
 
+
 class DirectorAccessMiddleware(BaseMiddleware):
     def __init__(self, get_allowed_ids: Callable[[], Awaitable[list[int]]]):
         self.get_allowed_ids = get_allowed_ids
 
     async def __call__(
-            self,
-            handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
-            event: Message,
-            data: Dict[str, Any],
-
+        self,
+        handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
+        event: Message,
+        data: Dict[str, Any],
     ) -> Any:
         allowed_ids = await self.get_allowed_ids()
 
@@ -47,8 +47,8 @@ class DirectorAccessMiddleware(BaseMiddleware):
         if text.startswith("/") and state_data is not None:
             await state.clear()
             dp: Dispatcher = data.get("dispatcher")
-            bot: Bot = data.get('bot')
-            update_id = data.get('update_id')
+            bot: Bot = data.get("bot")
+            update_id = data.get("update_id")
             if update_id is None:
                 update_id = int(time.time() * 1000)
 

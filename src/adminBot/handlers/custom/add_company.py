@@ -18,7 +18,7 @@ class AddCompany(StatesGroup):
 async def add_company_init(message: Message, state: FSMContext):
     await state.clear()
     await message.reply(
-        "Напишите название компании, которую требуется добавит:",
+        "Напишите название компании, которую требуется добавить:",
         reply_markup=ReplyKeyboardRemove(),
     )
     await state.set_state(AddCompany.init)
@@ -36,7 +36,7 @@ async def check_company_command(message: Message, state: FSMContext):
         )
     elif check_company_data:
         await message.reply(
-            "Данная компания уже есть базе данных и она активная.",
+            "Данная компания уже есть базе данных и она активна.",
             reply_markup=ReplyKeyboardRemove(),
         )
     else:

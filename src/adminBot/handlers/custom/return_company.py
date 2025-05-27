@@ -22,7 +22,7 @@ async def return_company(message: Message, state: FSMContext):
     if repl_data:
         await state.set_state(RetComp.init)
         await message.reply(
-            "Для возврата в активные компании, выберите неоходимую списка",
+            "Для возврата в активные компании, выберите необходимую из списка",
             reply_markup=repl_data,
         )
     else:

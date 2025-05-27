@@ -43,7 +43,7 @@ async def send_type(message: Message, state: FSMContext):
     :return:
     """
     repl_data = await state.get_value("task")
-    await message.reply("Выберите тип заявки", reply_markup=repl_data[1])
+    await message.reply("Выберите тип заявки:", reply_markup=repl_data[1])
 
 
 async def send_period(message: Message, state: FSMContext):
@@ -55,7 +55,7 @@ async def send_period(message: Message, state: FSMContext):
     """
     repl_data = await state.get_value("period")
     await message.reply(
-        "Выбрите период, для которого составить отчет",
+        "Выбрите период, для которого требуется отчет:",
         reply_markup=repl_data[1],
     )
 
@@ -64,7 +64,7 @@ async def start_command(message: Message, state: FSMContext):
     await state.clear()
     await state.set_state(Excel.init)
     await message.reply(
-        "Выберите необходимый пункт меню", reply_markup=rep.employee
+        "Выберите необходимый пункт меню:", reply_markup=rep.employee
     )
 
 

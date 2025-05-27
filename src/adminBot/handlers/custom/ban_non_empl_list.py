@@ -23,6 +23,6 @@ async def add_dir_init(message: Message, state: FSMContext):
             )
     else:
         await message.reply(
-            "В базе данных нет неактивных пользователей",
+            "В базе данных нет неактивных пользователей.",
             reply_markup=ReplyKeyboardRemove(),
         )
