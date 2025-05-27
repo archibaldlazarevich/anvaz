@@ -62,7 +62,7 @@ async def send_message():
 
 async def scheduler_start():
     await asyncio.sleep(5)
-    scheduler.add_job(send_message, trigger="interval", minutes=1)
+    scheduler.add_job(send_message, trigger="interval", hours=1)
     scheduler.start()
     try:
         await asyncio.Event().wait()

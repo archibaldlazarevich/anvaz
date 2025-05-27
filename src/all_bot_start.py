@@ -8,6 +8,7 @@ from src.adminBot.handlers.custom.add_address import router_add_address
 from src.adminBot.handlers.custom.add_company import router_add_company
 from src.adminBot.handlers.custom.address_list import router_address_list
 from src.adminBot.handlers.custom.company_list import router_company_list
+from src.adminBot.handlers.custom.get_db_log import router_db_log
 from src.adminBot.handlers.custom.return_address import router_return_address
 from src.adminBot.handlers.custom.return_company import router_return_company
 from src.adminBot.handlers.custom.rm_address import router_address_rm
@@ -169,6 +170,7 @@ async def start_bot_admin():
         router_return_company,
         router_address_rm,
         router_company_rm,
+        router_db_log,
     )
     dp_admin.startup.register(set_commands_admin)
     dp_admin.message.middleware(

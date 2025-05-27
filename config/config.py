@@ -65,6 +65,7 @@ DEFAULT_ADMIN_COMMANDS = (
     ("return_job", "Вернуть неактивный вид работ"),
     ("return_company", "Вернуть неактивную компанию"),
     ("return_address", "Вернуть неактивный адрес"),
+    ('get_db_log','Получить актуальное состояние базы данных и логов'),
 )
 
 DEFAULT_REGISTER_COMMAND = (("start", "Запустить бота"),)
