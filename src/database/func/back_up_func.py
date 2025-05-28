@@ -18,7 +18,8 @@ async def back_up_func():
     tomorrow = now + timedelta(days=2)
 
     is_penultimate_day = tomorrow.day == 1
-    if 23 > now.hour > 8:
+
+    if 23 > now.hour > 8 and now.hour % 3 != 1:
         await send_email_with_attachment(
             subject="База данных",
             message=f'К письму прикреплена версия базы данных за {now.strftime("%H:%M %d.%m.%Y г.")}',
