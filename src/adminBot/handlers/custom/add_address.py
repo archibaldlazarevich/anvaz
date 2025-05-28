@@ -60,22 +60,26 @@ async def check_company_command(message: Message, state: FSMContext):
 
 @router_add_address.message(AddAddress.create_address)
 async def add_dir_choice(message: Message, state: FSMContext):
-    company_name = await state.get_value("create_address")
     address = message.text.lower()
-    check_address = await check_address_for_company_all(
-        company_name=company_name, address=address
-    )
-    if not check_address:
-        await add_new_address(company_name=company_name, address=address)
-        await message.reply("Адрес успешно добавлен.")
-    elif check_address == 3:
-        await message.reply(
-            "Данный адрес неактивен для данной компании, пожалуйста, "
-            "измените статус адреса на активный командой:\n/return_address",
-            reply_markup=ReplyKeyboardRemove(),
+    if len(address) > 2:
+        company_name = await state.get_value("create_address")
+        check_address = await check_address_for_company_all(
+            company_name=company_name, address=address
         )
+        if not check_address:
+            await add_new_address(company_name=company_name, address=address)
+            await message.reply("Адрес успешно добавлен.")
+        elif check_address == 3:
+            await message.reply(
+                "Данный адрес неактивен для данной компании, пожалуйста, "
+                "измените статус адреса на активный командой:\n/return_address",
+                reply_markup=ReplyKeyboardRemove(),
+            )
+        else:
+            await message.reply(
+                f"Данный адрес для данной компании {company_name}, уже существует."
+            )
+        await state.clear()
     else:
-        await message.reply(
-            f"Данный адрес для данной компании {company_name}, уже существует."
-        )
-    await state.clear()
+        await message.reply(f'Ваш сообщение состоит из {len(address)} знаков, пожалуйста этого явно мало для '
+                            f'адреса компании. Пожалуйста, введите полный адрес компании')
