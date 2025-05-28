@@ -896,6 +896,7 @@ async def check_address_for_company(address: str, company_name: str):
 async def get_address_company_id(address: str, company_name: str):
     """
     Функуия возвращает id комапнии адреса по названию адреса
+    :param company_name:
     :param address:
     :return:
     """
@@ -1225,21 +1226,6 @@ async def check_job(job_name: str):
         )
         result = result_data.scalar_one_or_none()
     return isinstance(result, int)
-
-
-async def change_task_by_company(company_name: str):
-    """
-    Функция меняяет количество задач у компаниим на -1
-    :param company_name:
-    :return:
-    """
-    async with get_db_session() as session:
-        await session.execute(
-            update(Company)
-            .where(Company.company_name == company_name)
-            .values(tasks=Company.tasks - 1)
-        )
-        await session.commit()
 
 
 async def get_task_all_data(task_id: int):
