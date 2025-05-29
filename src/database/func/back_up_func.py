@@ -2,7 +2,7 @@ import asyncio
 import os
 from datetime import datetime, timedelta
 
-from src.database.func.email_func import send_email_with_attachment
+from src.database.func.excel_func import send_excel
 from src.database.func.exel_func import export_sqlalchemy_to_excel
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
@@ -19,15 +19,15 @@ async def back_up_func():
 
     is_penultimate_day = tomorrow.day == 1
 
-    if 23 > now.hour > 8 and now.hour % 3 != 1:
-        await send_email_with_attachment(
+    if 23 > now.hour > 8 and now.hour % 2 != 1:
+        await send_excel(
             subject="База данных",
             message=f'К письму прикреплена версия базы данных за {now.strftime("%H:%M %d.%m.%Y г.")}',
             attachment_path="base.db",
         )
     if now.hour == 23 and now.weekday() not in (5, 6):
         await export_sqlalchemy_to_excel(excel_path="day", time=1, all_=True)
-        await send_email_with_attachment(
+        await send_excel(
             subject="Отчет за день",
             message=f"К письму прикреплен отчет за сутки",
             attachment_path="day.xlsx",
@@ -35,7 +35,7 @@ async def back_up_func():
         os.remove("day.xlsx")
     if now.hour == 23 and now.weekday() == 4:
         await export_sqlalchemy_to_excel(excel_path="week", time=7, all_=True)
-        await send_email_with_attachment(
+        await send_excel(
             subject="Отчет за неделю",
             message=f"К письму прикреплен отчет за неделю",
             attachment_path="week.xlsx",
@@ -45,7 +45,7 @@ async def back_up_func():
         await export_sqlalchemy_to_excel(
             excel_path="month", time=30, all_=True
         )
-        await send_email_with_attachment(
+        await send_excel(
             subject="Отчет за месяц",
             message=f"К письму прикреплен отчет за месяц",
             attachment_path="month.xlsx",

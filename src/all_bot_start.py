@@ -178,16 +178,18 @@ async def start_bot_admin():
         AdminAccessMiddleware(get_allowed_ids=get_admin_id)
     )
     await bot_admin.delete_webhook(drop_pending_updates=True)
-    await bot_admin.set_my_description('Admin Bot — мощный административный инструмент '
-                                       'для управления базой данных. '
-                                       'Добавляйте и удаляйте компании,'
-                                       ' сотрудников, адреса и виды работ, '
-                                       'контролируйте списки пользователей и '
-                                       'получайте отчёты о состоянии системы.', language_code='ru')
+    await bot_admin.set_my_description(
+        "Admin Bot — мощный административный инструмент "
+        "для управления базой данных. "
+        "Добавляйте и удаляйте компании,"
+        " сотрудников, адреса и виды работ, "
+        "контролируйте списки пользователей и "
+        "получайте отчёты о состоянии системы.",
+        language_code="ru",
+    )
     await dp_admin.start_polling(
         bot_admin, allowed_updates=dp_admin.resolve_used_update_types()
     )
-
 
 
 async def start_bot_dir():
@@ -206,15 +208,17 @@ async def start_bot_dir():
         DirectorAccessMiddleware(get_allowed_ids=get_all_dir_id)
     )
     await bot_dir.delete_webhook(drop_pending_updates=True)
-    await bot_dir.set_my_description('Director Bot — инструмент для руководителей, '
-                                     'который помогает контролировать процесс работы. '
-                                     'Просматривайте заявки в работе, получайте '
-                                     'актуальные данные по сотрудникам, '
-                                     'распределяйте задачи и анализируйте занятость команды.', language_code='ru')
+    await bot_dir.set_my_description(
+        "Director Bot — инструмент для руководителей, "
+        "который помогает контролировать процесс работы. "
+        "Просматривайте заявки в работе, получайте "
+        "актуальные данные по сотрудникам, "
+        "распределяйте задачи и анализируйте занятость команды.",
+        language_code="ru",
+    )
     await dp_dir.start_polling(
         bot_dir, allowed_updates=dp_dir.resolve_used_update_types()
     )
-
 
 
 async def start_bot_register():
@@ -223,13 +227,15 @@ async def start_bot_register():
     )
     dp_register.startup.register(set_commands_register)
     await bot_register.delete_webhook(drop_pending_updates=True)
-    await bot_register.set_my_description('Register Bot — простой и безопасный бот для регистрации новых '
-                                          'сотрудников в системе. Обеспечивает быстрый ввод данных и интеграцию'
-                                          ' с базой, позволяя легко расширять команду.', language_code='ru')
+    await bot_register.set_my_description(
+        "Register Bot — простой и безопасный бот для регистрации новых "
+        "сотрудников в системе. Обеспечивает быстрый ввод данных и интеграцию"
+        " с базой, позволяя легко расширять команду.",
+        language_code="ru",
+    )
     await dp_register.start_polling(
         bot_register, allowed_updates=dp_register.resolve_used_update_types()
     )
-
 
 
 async def start_bot_empl():
@@ -247,28 +253,32 @@ async def start_bot_empl():
     )
 
     await bot_employee.delete_webhook(drop_pending_updates=True)
-    await bot_employee.set_my_description('Employee Bot — удобный помощник для сотрудников. '
-                                          'Позволяет быстро создавать, просматривать, редактировать '
-                                          'и закрывать заявки на выезд. Всегда под рукой для '
-                                          'оперативного взаимодействия с задачами.', language_code='ru')
+    await bot_employee.set_my_description(
+        "Employee Bot — удобный помощник для сотрудников. "
+        "Позволяет быстро создавать, просматривать, редактировать "
+        "и закрывать заявки на выезд. Всегда под рукой для "
+        "оперативного взаимодействия с задачами.",
+        language_code="ru",
+    )
     await dp_employee.start_polling(
         bot_employee, allowed_updates=dp_employee.resolve_used_update_types()
     )
 
 
-
 async def start_bot_echo():
     await bot_echo.delete_webhook(drop_pending_updates=True)
-    await bot_echo.set_my_description('Echo Bot — централизованный бот для рассылки уведомлений '
-                                      'и сообщений, которые генерируются другими вашими ботами '
-                                      '(сотрудников, руководителей, администраторов и регистрации). '
-                                      'Он автоматически доставляет важную информацию подписчикам без '
-                                      'необходимости ввода команд, обеспечивая оперативное информирование '
-                                      'и синхронизацию данных между всеми участниками системы.', language_code='ru')
+    await bot_echo.set_my_description(
+        "Echo Bot — централизованный бот для рассылки уведомлений "
+        "и сообщений, которые генерируются другими вашими ботами "
+        "(сотрудников, руководителей, администраторов и регистрации). "
+        "Он автоматически доставляет важную информацию подписчикам без "
+        "необходимости ввода команд, обеспечивая оперативное информирование "
+        "и синхронизацию данных между всеми участниками системы.",
+        language_code="ru",
+    )
     await dp_echo.start_polling(
         bot_echo, allowed_updates=dp_echo.resolve_used_update_types()
     )
-
 
 
 async def main():

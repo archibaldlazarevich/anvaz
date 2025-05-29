@@ -7,14 +7,12 @@ from src.database.func.data_func import get_all_dir_id_for_echo, get_admin_id
 bot = Bot(token=ECHO_BOT)
 
 
-async def send_email_with_attachment(
+async def send_excel(
     subject,
     message,
     attachment_path,
 ):
-    file = FSInputFile(
-        path=(f"{attachment_path}"), filename=f"{attachment_path}"
-    )
+    file = FSInputFile(path=attachment_path, filename=attachment_path)
     log_file = FSInputFile(path=(f"output.log"), filename=f"output.log")
     text = (
         f"Тема сообщения: \n{subject}\n\n" f"Текст сообщения: \n{message}\n\n"

@@ -8,13 +8,12 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.pool import NullPool
 from typing import AsyncGenerator
-from config.config import DATABASE_URL
+from config.config import DATABASE_URL, ADMIN_ID
 from src.database.models import (
     Base,
     Admin,
     Staff,
     JobType,
-    ChangeJobs,
     Jobs,
     Company,
     Address,
@@ -45,10 +44,10 @@ async def get_db_session() -> AsyncGenerator:
 
 
 async def create_db() -> None:
-    admin = Admin(tel_ad_id=434988753)
+    admin = Admin(tel_ad_id=ADMIN_ID)
     users = [
         Staff(
-            tel_id=random.randint(434988753, 500000000),
+            tel_id=random.randint(434988752, 500000000),
             status=1,
             name=fake.last_name().lower(),
             surname=fake.last_name().lower(),
@@ -89,18 +88,18 @@ async def create_db() -> None:
     ]
     directors.append(
         Staff(
-            tel_id=434988753,
+            tel_id=ADMIN_ID,
             status=3,
-            name='Директор',
-            surname='Teст',
+            name="Директор",
+            surname="Teст",
         )
     )
     employees.append(
         Staff(
-            tel_id=434988753,
+            tel_id=ADMIN_ID,
             status=2,
-            name='Работник',
-            surname='Тест',
+            name="Работник",
+            surname="Тест",
         )
     )
     company = [

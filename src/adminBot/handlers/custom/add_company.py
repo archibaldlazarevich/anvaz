@@ -43,9 +43,12 @@ async def check_company_command(message: Message, state: FSMContext):
         else:
             await add_company(company_name=company_name)
             await message.reply(
-                "Кампания успешно добавлена.", reply_markup=ReplyKeyboardRemove()
+                "Кампания успешно добавлена.",
+                reply_markup=ReplyKeyboardRemove(),
             )
         await state.clear()
     else:
-        await message.reply(f'Ваш сообщение состоит из {len(company_name)} знаков, пожалуйста этого явно мало для '
-                            f'названия компании. Пожалуйста, введите полное название компании')
+        await message.reply(
+            f"Ваш сообщение состоит из {len(company_name)} знаков, пожалуйста этого явно мало для "
+            f"названия компании. Пожалуйста, введите полное название компании"
+        )
