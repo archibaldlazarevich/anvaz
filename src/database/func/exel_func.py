@@ -1,9 +1,9 @@
 from typing import Optional
 
 import pandas as pd
-from src.database.func.email_models import (
-    get_all_data_for_pdf_or_excel,
-    get_personal_data_for_pdf_or_excel,
+from src.database.func.excel_models import (
+    get_all_data_for_excel,
+    get_personal_data_for_excel,
 )
 
 
@@ -26,14 +26,12 @@ async def export_sqlalchemy_to_excel(
     :return:
     """
     if name:
-        result = await get_personal_data_for_pdf_or_excel(
+        result = await get_personal_data_for_excel(
             name=name, surname=surname, time=time, done=done, all_=all_
         )
     else:
-        result = await get_all_data_for_pdf_or_excel(
-            time=time, done=done, all_=all_
-        )
-    if len(result) != 0:
+        result = await get_all_data_for_excel(time=time, done=done, all_=all_)
+    if result:
         headers = [
             "№ заявки",
             "Наименование работ",

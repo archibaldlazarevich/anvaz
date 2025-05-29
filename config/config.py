@@ -17,6 +17,7 @@ ECHO_BOT: str = cast(str, os.getenv("ECHO_BOT"))
 EMAIL_NAME: str = cast(str, os.getenv("EMAIL_NAME"))
 EMAIL_PASSWORD: str = cast(str, os.getenv("EMAIL_PASSWORD"))
 RECIPIENT_EMAIL: str = cast(str, os.getenv("RECIPIENT_EMAIL"))
+ADMIN_ID: int = cast(int, os.getenv("ADMIN_ID"))
 
 DEFAULT_EMPLOYEE_COMMANDS = (
     ("start", "Запустить бота"),

@@ -9,7 +9,7 @@ from src.database.create_db import get_db_session
 from src.database.models import Jobs, Staff
 
 
-async def get_all_data_for_pdf_or_excel(
+async def get_all_data_for_excel(
     time: Optional[int] = None, done: bool = False, all_: bool = False
 ):
     """
@@ -49,7 +49,7 @@ async def get_all_data_for_pdf_or_excel(
     return all_data.scalars().all()
 
 
-async def get_personal_data_for_pdf_or_excel(
+async def get_personal_data_for_excel(
     name: str,
     surname: str,
     time: Optional[int] = None,

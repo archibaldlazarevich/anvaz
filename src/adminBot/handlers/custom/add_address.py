@@ -81,5 +81,7 @@ async def add_dir_choice(message: Message, state: FSMContext):
             )
         await state.clear()
     else:
-        await message.reply(f'Ваш сообщение состоит из {len(address)} знаков, пожалуйста этого явно мало для '
-                            f'адреса компании. Пожалуйста, введите полный адрес компании')
+        await message.reply(
+            f"Ваш сообщение состоит из {len(address)} знаков, пожалуйста этого явно мало для "
+            f"адреса компании. Пожалуйста, введите полный адрес компании"
+        )

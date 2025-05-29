@@ -26,7 +26,7 @@ async def add_dir_init(message: Message, state: FSMContext):
 @router_add_jobs.message(AddJob.init)
 async def add_dir_choice(message: Message, state: FSMContext):
     job = message.text
-    if len(job) > 4 :
+    if len(job) > 4:
         if not await check_job(job_name=job.lower()):
             await state.clear()
             await add_job(job_name=job.lower())
@@ -40,5 +40,7 @@ async def add_dir_choice(message: Message, state: FSMContext):
                 "если он неактивен, восстановите его командой:\n/return_job"
             )
     else:
-        await message.reply(f'Ваш сообщение состоит из {len(job)} знаков, пожалуйста этого явно мало для '
-                        f'обозначения вида работ. Пожалуйста, введите полное название работ')
+        await message.reply(
+            f"Ваш сообщение состоит из {len(job)} знаков, пожалуйста этого явно мало для "
+            f"обозначения вида работ. Пожалуйста, введите полное название работ"
+        )
