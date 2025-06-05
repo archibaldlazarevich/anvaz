@@ -4,6 +4,11 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.types import BotCommand, BotCommandScopeDefault
 
+
+# adminbot
+from src.adminBot.handlers.default.start import router_start_admin
+from src.adminBot.handlers.default.help import router_help_admin
+
 from src.adminBot.handlers.custom.add_address import router_add_address
 from src.adminBot.handlers.custom.add_company import router_add_company
 from src.adminBot.handlers.custom.address_list import router_address_list
@@ -13,11 +18,6 @@ from src.adminBot.handlers.custom.return_address import router_return_address
 from src.adminBot.handlers.custom.return_company import router_return_company
 from src.adminBot.handlers.custom.rm_address import router_address_rm
 from src.adminBot.handlers.custom.rm_company import router_company_rm
-
-# adminbot
-from src.adminBot.handlers.default.start import router_start_admin
-from src.adminBot.handlers.default.help import router_help_admin
-
 from src.adminBot.handlers.custom.return_job import router_return_job
 from src.adminBot.handlers.custom.add_director import router_add_directors
 from src.adminBot.handlers.custom.add_employee import router_add_empl
@@ -43,6 +43,8 @@ from src.database.func.data_func import get_admin_id
 # dir bot
 
 from src.directorBot.handlers.custom.change_empl import router_change
+from src.directorBot.handlers.custom.exel_change import router_dir_excel_change
+from src.directorBot.handlers.custom.job_number import router_dir_job_number
 from src.directorBot.handlers.default.start import router_start_dir
 from src.directorBot.handlers.default.help import router_help_dir
 from src.directorBot.handlers.custom.in_process import router_in_process
@@ -202,6 +204,8 @@ async def start_bot_dir():
         router_dir_emp,
         router_dir_excel,
         router_change,
+        router_dir_excel_change,
+        router_dir_job_number,
     )
     dp_dir.startup.register(set_commands_dir)
     dp_dir.message.middleware(

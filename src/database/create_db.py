@@ -90,16 +90,16 @@ async def create_db() -> None:
         Staff(
             tel_id=ADMIN_ID,
             status=3,
-            name="Директор",
-            surname="Teст",
+            name="директор",
+            surname="тeст",
         )
     )
     employees.append(
         Staff(
             tel_id=ADMIN_ID,
             status=2,
-            name="Работник",
-            surname="Тест",
+            name="работник",
+            surname="тест",
         )
     )
     company = [

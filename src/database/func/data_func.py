@@ -1,4 +1,4 @@
-from sqlalchemy.orm import joinedload, aliased
+from sqlalchemy.orm import joinedload, aliased, contains_eager
 import datetime
 from sqlalchemy import func, case, desc
 
@@ -156,6 +156,27 @@ async def get_all_emp() -> list:
         )
         all_emp_data = all_emp_data.scalars()
     return [(person.name, person.surname) for person in all_emp_data]
+
+
+async def get_all_emp_with_change() -> list:
+    """
+    Функция по получению всех работников в б.д. с измененями видо вработ
+    :return:
+    """
+    async with get_db_session() as session:
+        all_emp_data = await session.execute(
+            select(ChangeJobs)
+            .join(ChangeJobs.staff)
+            .options(contains_eager(ChangeJobs.staff))
+            .where(Staff.status == 2)
+            .order_by(ChangeJobs.staff)
+        )
+        all_emp_data = all_emp_data.unique().scalars()
+        new_data = {
+            (person.staff.name, person.staff.surname)
+            for person in all_emp_data
+        }
+    return [(person[0], person[1]) for person in new_data]
 
 
 async def get_all_jobs() -> list:
@@ -542,7 +563,11 @@ async def set_new_empl_for_job(task_id: int, name: str, surname: str):
     async with get_db_session() as session:
         staff_data = await session.execute(
             select(Staff.id).where(
-                and_(Staff.name == name, Staff.surname == surname)
+                and_(
+                    Staff.name == name,
+                    Staff.surname == surname,
+                    Staff.status == 2,
+                )
             )
         )
         staff_id = staff_data.scalar_one_or_none()
@@ -550,6 +575,11 @@ async def set_new_empl_for_job(task_id: int, name: str, surname: str):
             update(Jobs)
             .where(and_(Jobs.id == task_id))
             .values(employee=staff_id)
+        )
+        await session.execute(
+            update(ChangeJobs)
+            .where(ChangeJobs.jobs_id == task_id)
+            .values(employee_id=staff_id)
         )
         await session.commit()
         proc_data = await session.execute(
@@ -725,6 +755,20 @@ async def get_all_company_name():
         company_name.company_name
         for company_name in company_name_data.scalars().all()
     ]
+
+
+async def get_job_number(company_name: str):
+    """
+    Функция, возвращает количество обработанных заявок для компании
+    :param company_name:
+    :return:
+    """
+    async with get_db_session() as session:
+        task_number_data = await session.execute(
+            select(Company.tasks).where(Company.company_name == company_name)
+        )
+        task_number = task_number_data.scalar_one_or_none()
+    return task_number
 
 
 async def get_all_active_company_name():

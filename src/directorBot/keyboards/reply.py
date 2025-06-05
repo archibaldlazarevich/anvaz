@@ -3,11 +3,31 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 from src.database.func.data_func import (
     get_busy_empl,
-    get_all_job_by_empl,
     get_busy_empl_without_spec_empl,
     get_job_by_empl,
     get_all_emp,
+    get_all_emp_with_change,
+    get_all_active_company_name,
 )
+
+
+async def get_company_name():
+    """
+    Функция возвращает клавиатуру если есть названия компаний в бд и False при их отсутствии
+    :return:
+    """
+    all_company_name = await get_all_active_company_name()
+    if all_company_name:
+        all_data = [data.capitalize() for data in all_company_name]
+        keyboard = ReplyKeyboardBuilder()
+        for data in all_data:
+            keyboard.add(KeyboardButton(text=data))
+        markup = keyboard.adjust(1).as_markup(
+            resize_keyboard=True,
+            one_time_keyboard=True,
+        )
+        return all_data, markup
+    return False
 
 
 async def key_busy_employee():
@@ -37,6 +57,27 @@ async def get_all_empl():
     :return:
     """
     all_busy_staff = await get_all_emp()
+    keyboard = ReplyKeyboardBuilder()
+    if all_busy_staff:
+        all_data = [
+            f"{data[0].title()} {data[1].title()}" for data in all_busy_staff
+        ]
+        for data in all_data:
+            keyboard.add(KeyboardButton(text=data))
+        markup = keyboard.adjust(1).as_markup(
+            resize_keyboard=True,
+            one_time_keyboard=True,
+        )
+        return all_data, markup
+    return False
+
+
+async def get_all_empl_with_change():
+    """
+    Функция, для составления клавиатуру со всеми работниками с записями в изменениях видов работ
+    :return:
+    """
+    all_busy_staff = await get_all_emp_with_change()
     keyboard = ReplyKeyboardBuilder()
     if all_busy_staff:
         all_data = [
