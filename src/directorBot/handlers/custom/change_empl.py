@@ -32,7 +32,7 @@ async def send_job(message: Message, state: FSMContext):
     repl_job = await state.get_value("change_empl")
     name, surname = await state.get_value("init")
     await message.reply(
-        f"Выберите заявку {name} {surname},\n"
+        f"Выберите заявку {name.title()} {surname.title()},\n"
         f"которую вы хотите переместить на другого работника:",
         reply_markup=repl_job[1],
     )
@@ -139,7 +139,7 @@ async def cancel_update(message: Message, state: FSMContext):
             f"Тип работы: {new_task_data[1].capitalize()}\n"
             f"Организация: {new_task_data[2].capitalize()}\n"
             f"Время поступления заявки: {new_task_data[3]}\n"
-            f"Ответсвенный работник: {new_task_data[5].capitalize()} {new_task_data[6].capitalize()}"
+            f"Ответственный работник: {new_task_data[5].capitalize()} {new_task_data[6].capitalize()}"
         )
         await state.clear()
         await message.reply(text=text, reply_markup=ReplyKeyboardRemove())

@@ -6,15 +6,15 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, ReplyKeyboardRemove, FSInputFile
 
-from src.database.func.exel_func import export_sqlalchemy_to_excel
+from src.database.func.exel_func import export_change_task
 import src.directorBot.keyboards.reply as rep
 
-router_dir_excel = Router()
+router_dir_excel_change = Router()
 
 all_data = ["Все сотрудники", "Определённый сотрудник"]
 
 
-class Excel(StatesGroup):
+class ExcelChange(StatesGroup):
     init: State = State()
     empl: State = State()
     task: State = State()
@@ -62,18 +62,18 @@ async def send_period(message: Message, state: FSMContext):
 
 async def start_command(message: Message, state: FSMContext):
     await state.clear()
-    await state.set_state(Excel.init)
+    await state.set_state(ExcelChange.init)
     await message.reply(
         "Выберите необходимый пункт меню:", reply_markup=rep.employee
     )
 
 
-@router_dir_excel.message(Command("excel"))
+@router_dir_excel_change.message(Command("excel_change"))
 async def busy_init(message: Message, state: FSMContext):
     await start_command(message=message, state=state)
 
 
-@router_dir_excel.message(F.text.not_in(all_data), Excel.init)
+@router_dir_excel_change.message(F.text.not_in(all_data), ExcelChange.init)
 async def check(message: Message, state: FSMContext):
     await message.reply(
         "Выберите данные из списка!!!", reply_markup=ReplyKeyboardRemove()
@@ -81,38 +81,40 @@ async def check(message: Message, state: FSMContext):
     await start_command(message=message, state=state)
 
 
-@router_dir_excel.message(F.text == "Все сотрудники", Excel.init)
+@router_dir_excel_change.message(F.text == "Все сотрудники", ExcelChange.init)
 async def busy_next(message: Message, state: FSMContext):
     await state.update_data(init=message.text)
-    await state.set_state(Excel.task)
+    await state.set_state(ExcelChange.task)
     repl_data = await rep.task_choice()
     await state.update_data(task=repl_data)
     await send_type(message=message, state=state)
 
 
-@router_dir_excel.message(F.text == "Определённый сотрудник", Excel.init)
+@router_dir_excel_change.message(
+    F.text == "Определённый сотрудник", ExcelChange.init
+)
 async def busy_person(message: Message, state: FSMContext):
     await state.update_data(init=message.text)
-    await state.set_state(Excel.empl)
-    repl_data = await rep.get_all_empl()
+    await state.set_state(ExcelChange.empl)
+    repl_data = await rep.get_all_empl_with_change()
     if repl_data:
         await state.update_data(empl=repl_data)
         await send_spec_empl(message=message, state=state)
     else:
         await message.reply(
-            "В данный момент нет сотрудников с оформленными заявками.",
+            "В данный момент нет сотрудников с измененными заявками",
             reply_markup=ReplyKeyboardRemove(),
         )
         await state.clear()
 
 
-@router_dir_excel.message(Excel.empl)
+@router_dir_excel_change.message(ExcelChange.empl)
 async def busy_person_answer(message: Message, state: FSMContext):
     empl_data = await state.get_value("empl")
     if message.text in empl_data[0]:
         name, surname = message.text.split()
         await state.update_data(empl=(name.lower(), surname.lower()))
-        await state.set_state(Excel.task)
+        await state.set_state(ExcelChange.task)
         repl_data = await rep.task_choice()
         await state.update_data(task=repl_data)
         await send_type(message=message, state=state)
@@ -123,12 +125,12 @@ async def busy_person_answer(message: Message, state: FSMContext):
         await send_spec_empl(message=message, state=state)
 
 
-@router_dir_excel.message(Excel.task)
+@router_dir_excel_change.message(ExcelChange.task)
 async def choice_task(message: Message, state: FSMContext):
     task_data = await state.get_value("task")
     if message.text in task_data[0]:
         await state.update_data(task=message.text)
-        await state.set_state(Excel.period)
+        await state.set_state(ExcelChange.period)
         repl_data = await rep.time_choice()
         await state.update_data(period=repl_data)
         await send_period(message=message, state=state)
@@ -139,7 +141,7 @@ async def choice_task(message: Message, state: FSMContext):
         await send_type(message=message, state=state)
 
 
-@router_dir_excel.message(Excel.period)
+@router_dir_excel_change.message(ExcelChange.period)
 async def choice_period(message: Message, state: FSMContext):
     period_data = await state.get_value("period")
     if message.text in period_data[0]:
@@ -183,7 +185,7 @@ async def answer(message: Message, data: dict):
         name = empl[0]
         surname = empl[1]
         answer_data["empl"] = (name, surname)
-        await export_sqlalchemy_to_excel(
+        await export_change_task(
             name=name.lower(),
             surname=surname.lower(),
             excel_path=f"{message.from_user.id}",
@@ -191,7 +193,7 @@ async def answer(message: Message, data: dict):
         )
         answer = f"{answer_data['tasks']}_{answer_data['time']}_{answer_data['empl'][0].title()}_{answer_data['empl'][1].title()}"
     else:
-        await export_sqlalchemy_to_excel(
+        await export_change_task(
             excel_path=f"{message.from_user.id}", **all_data
         )
         answer = f"{answer_data['tasks']}_{answer_data['time']}_Все_сотрудники"

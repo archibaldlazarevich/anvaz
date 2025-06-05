@@ -95,10 +95,6 @@ async def cancel_func(message: Message, state: FSMContext):
             text=text,
             chat_id=dir_id,
         )
-    # await send_email(
-    #     subject=f"{task_data[5][1].title()} {task_data[5][0].title()} изменил заявку № {task_data[0]}",
-    #     message=text,
-    # )
 
 
 @router_update_task.message(Command("update"))
